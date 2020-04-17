@@ -1,0 +1,24 @@
+#!/Users/apache/PycharmProjects/shushan-CF/venv/bin/python
+# file: evt_wait
+import sys
+from SystemEvent import SystemEvent
+
+timeout_s = None
+try:
+    event_name = sys.argv[1]
+    try:
+        timeout_s = float(sys.argv[2])
+    except IndexError:
+        pass
+except Exception:
+    sys.stderr.write("Usage: evt_wait <event_name> [timeout_s]")
+    sys.exit(2)
+
+se = SystemEvent(event_name)
+try:
+    if not se.wait(timeout_s):
+        sys.exit(1)
+except KeyboardInterrupt:
+    sys.stderr.write("\nevt_wait aborted!\n")
+    sys.exit(2)
+sys.exit(0)

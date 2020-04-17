@@ -1,0 +1,270 @@
+/*Fonts ––––––––––––––––––––––––––––––––––––––––––––––––––*/
+@import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+
+body{
+  margin: 0px; /*   0px*/
+  /*width: 1300px;  /*备注 设置整个页面page的宽度限定死*/
+  padding: 0px;
+  background-color: #F3F4F9;
+  font-family: 'Microsoft YaHei';
+  color: #080808;
+}
+
+td.CalendarDay {
+  padding: 0;
+} /* 备注:设置日历格式，否则日历显示不全有bug*/
+
+.study-browser-banner {
+  background: rgb(0, 81, 108); /*备注：顶部横条 背景色  rgb(2,21,70) */
+  color: white;
+  padding: 12px;
+  /* padding-left: 48px; /*取消以便表头跟下面表格做对齐*/
+}
+
+.div-logo{
+  display: inline-block;
+  float: right;
+}
+
+.logo{
+  height: 35px;
+  padding: 6px;
+  margin-top: 3px;
+}
+
+.h2-title, .h2-title-mobile{
+  font-family: 'Microsoft YaHei';
+  /*display: inline-block;*/
+  letter-spacing: 3.8px;
+  font-weight: 800;
+  font-size:  33px;
+  text-align: left; /*备注：添加头部文字对齐方式*/
+}
+
+.h2-title-mobile{
+  display: none;
+}
+
+h5, h6{
+  font-family: 'Microsoft YaHei';
+  font-weight: 600;
+  font-size: 16px;
+}
+
+apps-menu{
+  font-family: 'Microsoft YaHei';
+  font-size: 20px;
+}
+
+.container_title {    /* 设置注释格式 */
+  margin-top: 0;
+  /*  margin-bottom: 0.2em; */
+  font-size: 15px;  /* 2.6rem */
+  line-height: 2.6rem;
+}
+
+.info-icon {    /* 设置注释符号格式 */
+  float: right;
+  cursor: pointer;
+  height: 2.2rem;
+  width: 2.2rem;
+  /* margin: 0.2rem; */ /* 设置注释符号边距 */
+}
+
+/* 设置注释内容格式
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.modal {
+    position: fixed;
+    z-index: 1002; /* Sit on top, including modebar which has z=1001 */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+}
+
+.modal-content {
+    z-index: 1004; /* Sit on top, including modebar which has z=1001 */
+    position: fixed;
+    left: 0;
+    width: 60%;
+    background-color: #3949ab;  /* Material indigo 600 */
+    color: white;
+    border-radius: 5px;
+    margin-left: 20%;
+    margin-bottom: 2%;
+    margin-top: 2%;
+}
+
+.modal-content > div {
+    text-align: left;
+    margin: 15px;
+}
+
+.modal-content.bottom {
+    bottom: 0;
+}
+
+.modal-content.top {
+    top: 0;
+}
+
+
+h5{
+  padding-left: 42px;
+}
+
+.alert {
+  padding: 20px;
+  background-color: #f44336;
+  color: white;
+}
+
+.bg-white{
+  background-color: white;
+  padding: 0px 5px;  /*备注:设置整个左右框架边距 48px 24px 48px 24px; */
+  /*height: 615px;   备注:设置整个左右框架高度 500px; */
+}
+
+.app-body{
+  /* margin-left: 4%; */ /* 取消没什么作用*/
+  margin: auto; /* 新增控制整体宽度*/
+  width: 1250px; /* 新增控制整体宽度*/
+}
+
+.card{
+  margin:8px 10px 8px 4px; /*备注:padding 48px 24px 48px 24px; */
+  margin-left: 4%;
+}
+
+.card-top{
+  margin:8px 10px 8px 4px; /*备注:padding 48px 24px 48px 24px; */
+  margin-top:48px; /*备注:padding */
+  margin-left: 4%;
+}
+
+
+.card-left{
+  margin:8px 0px 8px 4px;   /*备注:padding 48px 24px 48px 24px; */
+  margin-left: 0px; /*备注:padding */
+}
+
+.card-left-top{
+  margin:8px 0px 8px 4px; /*备注:padding 48px 24px 48px 24px; */
+  margin-top:48px; /*备注:padding */
+  margin-left: 0px;
+}
+
+.card-banner {
+  margin:8px 2px 8px 4px; /*备注:padding 48px 24px 48px 24px; */
+  margin-top:48px; /*备注:padding */
+  margin-left: 0px;
+}
+
+.padding-top-bot{
+  padding-top: 7px;
+  padding-bottom: 7px;  /* 设置 左侧 筛选相关控件顶部和底部边距 12px 18px*/
+}
+
+.mini_container {
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  margin: 10px;
+  padding: 15px;
+  position: relative;
+  box-shadow: 2px 2px 2px lightgrey;
+}
+
+
+.upload{
+  width: 100%;
+  line-height: 60px;
+  border-width: 1px;
+  border-style: dashed;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.upload p, .upload a {
+  display: inline;
+}
+
+/* 备注修改下拉框边框的大小和颜色
+.Select-control{
+  border: 1px solid #203cb3;
+} */
+
+@media only screen and (max-width: 320px){
+  .Select-menu-outer, .Select-value{
+    font-size: 10.5px;
+  }
+  .upload{
+    padding: 5px;
+  }
+}
+
+/* mobile */
+@media only screen and (max-width: 768px) {
+  .upload{
+    line-height: 60px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 5px;
+    text-align: center;
+    font-size: small;
+  }
+
+  .columns{
+    width: 100%;
+  }
+
+  .card, .card-left{
+    margin: 24px;
+    margin: 0px;
+  }
+
+  .bg-white{
+    height: auto;
+  }
+
+  .study-browser-banner{
+    /* padding-left: 24px; */
+  } /*取消以便表头跟下面表格做对齐*/
+
+  .logo{
+    height: 28px;
+    padding-left:0px;
+    padding-bottom:0px;
+  }
+
+  .div-logo{
+    float: left;
+    display: block;
+    width: 100%;
+  }
+
+  .h2-title{
+    display:none;
+  }
+
+  .h2-title-mobile{
+    display:block;
+    float:left;
+  }
+
+  .app-body{
+    margin-left: 0px;
+  }
+
+  .four.columns                   { width: 100%; }
+  .eight.columns                  { width: 100%; }
+
+  .columns{
+    text-align: center;
+  }
+
+  .user-control{
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}

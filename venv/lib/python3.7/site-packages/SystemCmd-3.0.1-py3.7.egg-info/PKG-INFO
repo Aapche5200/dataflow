@@ -1,0 +1,16 @@
+Metadata-Version: 1.1
+Name: SystemCmd
+Version: 3.0.1
+Summary: My wrappers for subprocess.POpen
+Home-page: http://github.com/AndreaCensi/system_cmd
+Author: Andrea Censi
+Author-email: censi@mit.edu
+License: UNKNOWN
+Download-URL: http://github.com/AndreaCensi/system_cmd/tarball/3.0.1
+Description: system_cmd
+        ==========
+        
+        A wrapper for subprocess.Popen.
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
