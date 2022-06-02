@@ -16,6 +16,7 @@ import dash_table
 from plotly.subplots import make_subplots  # 画子图加载包
 import dash_auth
 from pyhive import hive
+import prestodb
 import sys
 import urllib
 import dash
@@ -298,9 +299,13 @@ def update_table_ca(selected_dropdown_value_autofetch_ca,
                                         'Electronics': 'Electronics'}
     if autofetch_cate_two_out_goods == '总':
         con_red_atuofetch_goods = \
-            hive.Connection(host="ec2-34-222-53-168.us-west-2.compute.amazonaws.com",
-                            port=10000,
-                            username="hadoop")
+            prestodb.dbapi.connect(
+                host='ec2-54-68-88-224.us-west-2.compute.amazonaws.com',
+                port=80,
+                user='hadoop',
+                catalog='hive',
+                schema='default',
+            )
 
         sql_autofetch_cateone_goods = """
         SELECT item_no ,seller_type,{2}
@@ -324,7 +329,15 @@ def update_table_ca(selected_dropdown_value_autofetch_ca,
 
         print("打印autofetchgoods-商品维度数据-开始下载中")
 
-        data_autofetch_cateone_goods = pd.read_sql(sql_autofetch_cateone_goods, con_red_atuofetch_goods)
+        cursor = con_red_atuofetch_goods.cursor()
+        cursor.execute(sql_autofetch_cateone_goods)
+        data = cursor.fetchall()
+        column_descriptions = cursor.description
+        if data:
+            data_autofetch_cateone_goods = pd.DataFrame(data)
+            data_autofetch_cateone_goods.columns = [c[0] for c in column_descriptions]
+        else:
+            data_autofetch_cateone_goods = pd.DataFrame()
 
         csv_string_download_autofetch_goods = data_autofetch_cateone_goods.to_csv(index=False, encoding='utf-8')
         csv_string_download_autofetch_goods = "data:text/csv;charset=utf-8," + urllib.parse.quote(
@@ -374,9 +387,14 @@ def update_table_ca(selected_dropdown_value_autofetch_ca,
 
     else:
         con_red_atuofetch_goods = \
-            hive.Connection(host="ec2-34-222-53-168.us-west-2.compute.amazonaws.com",
-                            port=10000,
-                            username="hadoop")
+            prestodb.dbapi.connect(
+                host='ec2-54-68-88-224.us-west-2.compute.amazonaws.com',
+                port=80,
+                user='hadoop',
+                catalog='hive',
+                schema='default',
+            )
+
         sql_autofetch_cateone_goods = """
         SELECT item_no,seller_type ,{3}
 				from (
@@ -400,7 +418,15 @@ def update_table_ca(selected_dropdown_value_autofetch_ca,
 
         print("打印autofetchgoods-商品维度数据-开始下载中")
 
-        data_autofetch_cateone_goods = pd.read_sql(sql_autofetch_cateone_goods, con_red_atuofetch_goods)
+        cursor = con_red_atuofetch_goods.cursor()
+        cursor.execute(sql_autofetch_cateone_goods)
+        data = cursor.fetchall()
+        column_descriptions = cursor.description
+        if data:
+            data_autofetch_cateone_goods = pd.DataFrame(data)
+            data_autofetch_cateone_goods.columns = [c[0] for c in column_descriptions]
+        else:
+            data_autofetch_cateone_goods = pd.DataFrame()
 
         csv_string_download_autofetch_goods = data_autofetch_cateone_goods.to_csv(index=False, encoding='utf-8')
         csv_string_download_autofetch_goods = "data:text/csv;charset=utf-8," + urllib.parse.quote(
@@ -449,3 +475,5 @@ def update_table_ca(selected_dropdown_value_autofetch_ca,
         )
 
     return fig_auto_fetch_ca_goods, csv_string_download_autofetch_goods
+
+

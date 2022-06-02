@@ -1,0 +1,157 @@
+from pyhive import hive
+import pandas as pd
+from sqlalchemy.engine import create_engine
+
+con_hive = hive.Connection(host="175.24.24.12",
+                           username="yinss",
+                           port=10008,
+                           password='700234',
+                           auth='CUSTOM',
+                           database='dw', )
+
+sql = """
+
+select b.*,
+       imp_pv,
+       share_uv,
+       imp_uv
+from (
+         select date(a.dtime)                                                            as log_date,
+                a.item_id,
+                sum(itempage_pv)                                                         as imp_pv,
+                count(distinct if(share_pv > 0, consumer_id, null))                      as share_uv,
+                count(distinct case when itempage_pv > 0 then consumer_id else null end) as imp_uv
+         from dw.dw_log_consumer_item_tags_d as a
+                  join dw.dw_prd_item_d as b on a.item_id = b.item_id
+         where date(a.dtime) between date_sub(current_date, 7) and date_sub(current_date, 1)
+           and date(concat(substr(a.stat_day, 1, 4), '-', substr(a.stat_day, 5, 2), '-',
+                           substr(a.stat_day, 7, 2)))
+              between date_sub(current_date, 7) and date_sub(current_date, 1)
+           and date(concat(substr(b.stat_day, 1, 4), '-', substr(b.stat_day, 5, 2), '-',
+                           substr(b.stat_day, 7, 2)))
+             = date_sub(current_date, 1)
+           and cid1 <> 293
+           and item_oms_cname1 is not null
+           and item_oms_cname1 <> ''
+           and item_oms_cname1 not like '%旧%'
+           and item_oms_cname1 not like '%测试分类勿选%'
+           and item_name not like '%赠%'
+         group by date(a.dtime),
+                  a.item_id
+     ) as a
+         join
+     (
+         select date(pay_time)                                                                  as log_date,
+                item_id,
+                item_name,
+                oms_brand_id,
+                oms_brand_name,
+                item_oms_cname1,
+                item_oms_cid1,
+                item_oms_cname2,
+                item_oms_cid2,
+                item_oms_cname3,
+                item_oms_cid3,
+                item_oms_cname4,
+                item_oms_cid4,
+                count(distinct consumer_id)                                                     as user_num,
+                sum(internal_price)                                                             as gmv,
+                sum(buy_count)                                                                  as qty,
+                sum(gross_profit_price)                                                         as maoli_gmv,
+                sum(net_sale_money)                                                             as net_gmv,
+                sum(platform_net_price)                                                         as pingtai_maoli_gmv,
+                sum(net_sale_num)                                                               as net_qty,
+                (cast(sum(gross_profit_price) as double) / cast(sum(net_sale_money) as double)) as maoli_lv
+         from dw.dw_trd_order_barcode_anlys_d as a
+         where date(concat(substr(a.stat_day, 1, 4), '-', substr(a.stat_day, 5, 2), '-',
+                           substr(a.stat_day, 7, 2)))
+             = date_sub(current_date, 1)
+           and date(pay_time) between date_sub(current_date, 7) and date_sub(current_date, 1)
+           and normal_busi_type = 1
+           and order_source <> '外部直播'
+           and item_oms_cname1 not like '%测试分类勿选%'
+           and cid1 != 293
+           and net_sale_money > 0
+         group by date(pay_time),
+                  item_id,
+                  item_name,
+                  oms_brand_id,
+                  oms_brand_name,
+                  item_oms_cname1,
+                  item_oms_cid1,
+                  item_oms_cname2,
+                  item_oms_cid2,
+                  item_oms_cname3,
+                  item_oms_cid3,
+                  item_oms_cname4,
+                  item_oms_cid4
+     ) as b on a.log_date = b.log_date and a.item_id = b.item_id
+
+"""
+
+
+df = pd.read_sql(sql, con_hive)
+
+print(df)
+
+df.rename(
+    columns={
+        'b.log_date': '数据日期',
+        'b.item_id': '货号',
+        'b.item_name': '商品名称',
+        'b.oms_brand_id': '品牌ID',
+        'b.oms_brand_name': '品牌名称',
+        'b.item_oms_cname1': '一级类目名',
+        'b.item_oms_cid1': '一级类目ID',
+        'b.item_oms_cname2': '二级类目名',
+        'b.item_oms_cid2': '二级类目ID',
+        'b.item_oms_cname3': '三级类目名',
+        'b.item_oms_cid3': '三级类目ID',
+        'b.item_oms_cname4': '四级类目名',
+        'b.item_oms_cid4': '四级类目ID',
+        'b.user_num': '购买人数',
+        'b.gmv': '销售额',
+        'b.qty': '销量',
+        'b.maoli_gmv': '商品毛利额',
+        'b.net_gmv': '净利额',
+        'b.pingtai_maoli_gmv': '平台毛利额',
+        'b.net_qty': '净销量',
+        'b.maoli_lv': '商品毛利率',
+        'imp_pv': '商详PV',
+        'share_uv': '分享人数',
+        'imp_uv': '商详UV',
+    },
+    inplace=True)
+
+order = ['数据日期', '货号', '商品名称', '品牌ID', '品牌名称', '一级类目名', '一级类目ID', '二级类目名',
+         '二级类目ID', '三级类目名', '三级类目ID', '四级类目名', '四级类目ID', '购买人数', '销售额', '销量',
+         '商品毛利额', '净利额', '平台毛利额', '净销量', '商品毛利率', '商详PV', '分享人数', '商详UV', ]
+
+df = df[order]
+print(df)
+
+engine_ms = create_engine(
+    "mysql+pymysql://root:yssshushan2008@127.0.0.1:3306/YJgoods?charset=utf8")
+df.to_sql(
+    'ods_goods_day_report',
+    con=engine_ms,
+    if_exists='replace',
+    index=False)
+
+
+df.to_sql(
+    'ods_goods_day_report_update',
+    con=engine_ms,
+    if_exists='replace',
+    index=False)
+
+
+sql_ms = ('''
+select * from YJgoods.ods_goods_day_report
+order by 数据日期 desc
+limit 10
+''')
+
+df_ms = pd.read_sql(sql_ms, engine_ms)
+print(df_ms)
+

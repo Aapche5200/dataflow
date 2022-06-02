@@ -1,0 +1,101 @@
+import os
+import pandas as pd
+import prestodb
+from apyori import apriori
+
+con_presto = prestodb.dbapi.connect(
+    host='yunjipresto-wan.yunjiweidian.com',
+    port=443,
+    user='yinss',
+    catalog='hive_idc',
+    schema='default',
+    http_scheme='https',
+    auth=prestodb.auth.BasicAuthentication("yinss", "700234"),
+)
+
+sql_cate = '''
+           select a.order_id as orderid,
+              concat(cast(item_oms_cid4 as varchar), '-', item_oms_cname4) as cate
+           from dw.dw_trd_order_barcode_anlys_d as a
+           where date(substr(pay_time,1,10)) between date(current_date - interval '360' day) and date(current_date - interval '1' day)
+             and date(concat(substr(a.stat_day, 1, 4), '-', substr(a.stat_day, 5, 2), '-',
+                         substr(a.stat_day, 7, 2)))
+               = date(current_date - interval '1' day)
+             and order_status in (2, 3, 4, 9, -1, -2, -3) --计算正常销售 5 6是退款
+             and normal_busi_type = 1
+             and order_source <> '外部直播'
+             and item_oms_cname1 not like '%测试分类勿选%'
+             and cid1 != 293
+             and item_oms_cname4 <> '未知'
+             and pay_time is not null
+             and item_oms_cid4 is not null
+             and dept_name='服饰鞋包'
+             and (item_oms_cname4 not  like '%其它%'
+             and item_oms_cname4 not  like '%其他%')
+           '''
+
+cursor = con_presto.cursor()
+cursor.execute(sql_cate)
+data_cate = cursor.fetchall()
+column_descriptions = cursor.description
+if data_cate:
+    data = pd.DataFrame(data_cate)
+    data.columns = [c[0] for c in column_descriptions]
+else:
+    data = pd.DataFrame()
+
+# 2.关联规则中不考虑多次购买同一件物品，删除重复数据
+data = data.drop_duplicates()
+
+# 空值转换成0
+data.fillna(0, inplace=True)
+
+# 3.初始化列表
+trainData = []
+
+# 3.按订单分组，只有1件商品的没有意义，需要进行过滤
+groups = data.groupby(by='orderid')
+for group in groups:
+    if len(group[1]) >= 2:
+        trainData.append(group[1]['cate'].tolist())
+
+rules = apriori(trainData, min_support=0.006, min_confidence=0.3)
+result1 = pd.DataFrame(list(rules))
+
+support = result1.support
+
+first_values = []
+second_values = []
+third_values = []
+fourth_value = []
+
+for i in range(result1.shape[0]):
+    single_list = result1['ordered_statistics'][i][0]
+    first_values.append(list(single_list[0]))
+    second_values.append(list(single_list[1]))
+    third_values.append(single_list[2])
+    fourth_value.append(single_list[3])
+
+lhs = pd.DataFrame(first_values)
+rhs = pd.DataFrame(second_values)
+confidence = pd.DataFrame(third_values, columns=['Confidence'])
+lift = pd.DataFrame(fourth_value, columns=['Lift'])
+result = pd.concat([lhs, rhs, support, confidence, lift], axis=1)
+
+result.fillna(value='', inplace=True)
+print(result.head(10))
+print(result.columns.values)
+
+result.columns = ['Items', 'Recommend', 'support', 'confidance', 'lift']
+
+# result['Items'] = result['Items'] + str(" ") + result[1] + str(" ") + result[2]
+# result['Recommend'] = result['Recommend'] + str(" ") + result[3]
+# result.drop(columns=[1, 2, 3], inplace=True)
+
+writer = pd.ExcelWriter('关联性FP模型数据_apriori' + '.xlsx')
+result.to_excel(writer, sheet_name='训练结果', index=False)
+os.chdir(r'/Users/apache/Downloads')
+writer.save()
+
+
+

@@ -1,0 +1,361 @@
+import sys
+import urllib
+from datetime import datetime, timedelta
+
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import pandas as pd
+import plotly.graph_objects as go
+import pymysql
+from dash.dependencies import Input, Output, State
+from sqlalchemy.engine import create_engine
+
+sys.path.append('/Users/apache/PycharmProjects/shushan-CF/Dash+plotly/apps/projectone')
+from appshudashboard import app
+
+fig_auto_fetch_filter_goods = []
+
+app.layout = \
+    html.Div([
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.Div([
+                        html.Label("**货号维度下载**",
+                                   style={'textAlign': 'left', "width": "100%", 'position': 'relative',
+                                          'font-family': 'Microsoft YaHei', 'font-size': 15}),
+                    ],
+                    ),
+                    html.Div([
+                        html.Label("日期：",
+                                   style={'textAlign': 'left', "width": "100%", 'position': 'relative',
+                                          'font-family': 'Microsoft YaHei', 'font-size': 13}),
+                        html.Br(),
+                        dcc.DatePickerRange(
+                            id='date-picker-range-cate-autofetch',
+                            min_date_allowed=(datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d'),
+                            max_date_allowed=(datetime.now() - timedelta(days=0)).strftime('%Y-%m-%d'),
+                            start_date=(datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'),
+                            end_date=(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
+                            calendar_orientation='vertical',
+                            display_format="YY/M/D",  # q ε
+                            style={"height": "100%", "width": "150px", 'font-size': '9px'}
+                        )
+                    ],
+                    ),
+                    html.Div([
+                        html.A(html.Button("Download Data", id='data_autofetch_download_button_filter',
+                                           style={"width": '150px', 'font-family': 'Microsoft YaHei', 'font-size': 9}
+                                           ),
+                               id='autofetch-download-link-filter',
+                               href="",
+                               download="筛选货号数据.csv",
+                               target="_blank",
+                               ),
+                    ],
+                    )
+                ],
+                )
+            ],
+            ),
+            html.Div(
+                [
+                    html.Div(
+                        [
+                            html.Div([html.Label(children=["查询栏"]),
+                                      html.Label(id="paragraph-id", children=["修改栏"], style={'padding-left': '110px', }
+                                             )
+                                      ], style={'height': '20px', 'padding-top': '10px'},
+                                     ),
+                        ]
+                    ),
+                ]
+            ),
+            html.Div([
+                html.Div([
+                    html.Div([
+                        dcc.Textarea(
+                            id='item-no-filter',
+                            loading_state='is_loading',
+                            placeholder="请输入货号**查询\n"
+                                        " \n"
+                                        "示例-单个货号：\n"
+                                        "UPA004783030N\n"
+                                        " \n"
+                                        "示例-多个货号：\n"
+                                        "HPC006973405N\n"
+                                        "UPA004783030N\n"
+                                        " \n"
+                                        "ps:\n所有符号都在英文状态下\n",
+                            # value="'UPA004783030N'",
+                            style={'width': '150px', 'font-family': 'Microsoft YaHei', 'height': '200px',
+                                   'font-size': 8, 'textAlign': 'left',
+                                   'border-style': 'solid', 'border-color': '#D1D1D1', 'border-width': '1px'
+                                   }
+                        ),
+                        dcc.Textarea(
+                            id='value-update-no',
+                            loading_state='is_loading',
+                            placeholder="请输入数值**更新\n"
+                                        " \n"
+                                        "示例-单个字段：\n"
+                                        "商品名称='test'\n"
+                                        " \n"
+                                        "示例-多个字段：\n"
+                                        "商品名称='test'\n"
+                                        "商详UV=3333\n"
+                                        " \n"
+                                        "ps:\n所有符号都在英文状态下\n",
+                            # value="'UPA004783030N'",
+                            style={'width': '150px', 'font-family': 'Microsoft YaHei', 'height': '200px',
+                                   'font-size': 8, 'textAlign': 'left',
+                                   'border-style': 'solid', 'border-color': '#D1D1D1', 'border-width': '1px'
+                                   }
+                        )
+                    ],
+                    ),
+                    html.Div([
+                        html.Button('点击查询', id='goods-filter-button',
+                                    style={'font-family': 'Microsoft YaHei', 'font-size': 9, 'width': '150px',
+                                           }
+                                    ),
+                        html.Button('点击更新', id='value-update-no-button',
+                                    style={'font-family': 'Microsoft YaHei', 'font-size': 9, 'width': '150px',
+                                           }
+                                    )
+                    ],
+                    ),
+                ],
+                    style={'height': '220px'},
+                ),
+            ],
+            ),
+            html.Div([
+                html.Div(
+                    [
+                        html.Div([
+                            html.Label(
+                                id='show-AutoGoodsFilter-modal',
+                                children='�',
+                                n_clicks=0,
+                                # className='info-icon',
+                                style={"font-size": "13px", 'color': 'rgb(240, 240, 240)'}
+                            )
+                        ],
+                        ),
+                        html.Div(
+                            [
+                                html.Label("指标选择-多选：",
+                                           style={'textAlign': 'left', "width": "100%", 'position': 'relative',
+                                                  'font-family': 'Microsoft YaHei', 'font-size': 13}),
+                                dcc.Checklist(
+                                    id='filter_autofetch_goods_checklist',
+                                    options=[
+                                        {"label": "一级类目名", "value": "一级类目名"},
+                                        {"label": "二级类目名", "value": "二级类目名"},
+                                        {"label": "三级类目名", "value": "三级类目名"},
+                                        {"label": "四级类目名", "value": "四级类目名"},
+                                        {"label": "品牌名称", "value": "品牌名称"},
+                                        {"label": "商品名称", "value": "商品名称"},
+                                        {"label": "净利额", "value": "净利额"},
+                                        {"label": "净销量", "value": "净销量"},
+                                        {"label": "商品毛利额", "value": "商品毛利额"},
+                                        {"label": "平台毛利额", "value": "平台毛利额"},
+                                        {"label": "商详PV", "value": "商详PV"},
+                                        {"label": "商详UV", "value": "商详UV"},
+                                        {"label": "分享人数", "value": "分享人数"},
+                                        {"label": "销售额", "value": "销售额"},
+                                    ],
+                                    value=["商品名称"],
+                                    style={'font-family': 'Microsoft YaHei', 'font-size': 9},
+                                    labelStyle={'display': 'inline-block'}
+                                ),
+                            ],
+                        ),
+                        html.Div(
+                            [
+                                dcc.Graph(
+                                    id='my-graph-autofetch-goods-filter',
+                                    config={"displayModeBar": False}
+                                )
+                            ],
+                        )
+                    ],
+                    style={'height': '850px'},
+                )
+            ],
+            )
+        ],
+        )
+    ],
+    )
+
+for id in ['AutoGoodsFilter']:
+    @app.callback([Output(f"{id}-modal", 'style'), Output(f"{id}-div", 'style')],
+                  [Input(f'show-{id}-modal', 'n_clicks'),
+                   Input(f'close-{id}-modal', 'n_clicks')])
+    def toggle_modal(n_show, n_close):
+        ctx = dash.callback_context
+        if ctx.triggered and ctx.triggered[0]['prop_id'].startswith('show-'):
+            return {"display": "block"}, {'zIndex': 1003}
+        else:
+            return {"display": "none"}, {'zIndex': 0}
+
+
+@app.callback([Output('my-graph-autofetch-goods-filter', 'figure'), Output('autofetch-download-link-filter', 'href')],
+              [
+
+                  Input('goods-filter-button', 'n_clicks'),
+              ],
+              [
+                  State('date-picker-range-cate-autofetch', 'start_date'),
+                  State('date-picker-range-cate-autofetch', 'end_date'),
+                  State('item-no-filter', 'value'),
+                  State('filter_autofetch_goods_checklist', 'value'),
+              ])
+def update_table_ca(n_clicks, start_date, end_date,
+                    item_no_filter,
+                    filter_goods_valuelist):
+    print("打印autofetchfilter看板")
+    global fig_auto_fetch_filter_goods
+
+    engine_ms = create_engine("mysql+pymysql://root:yssshushan2008@127.0.0.1:3306/YJgoods?charset=utf8")
+
+    checklist = {"销售额": '销售额',
+                 "一级类目名": '一级类目名',
+                 "二级类目名": '二级类目名',
+                 "三级类目名": '三级类目名',
+                 "四级类目名": '四级类目名',
+                 "品牌名称": '品牌名称',
+                 "商品名称": '商品名称',
+                 "净利额": '净利额',
+                 "净销量": '净销量',
+                 "商品毛利额": '商品毛利额',
+                 "平台毛利额": '平台毛利额',
+                 "商详PV": '商详PV',
+                 "商详UV": "商详UV",
+                 "分享人数": '分享人数'
+                 }
+
+    item_no_re = item_no_filter.split()
+
+    prefix = "'"
+    suffix = "'\n"
+
+    sql_autofetch_cateone_goods_filter = f"""
+        SELECT '更新前' as 状态,货号 ,数据日期,{', '.join((checklist[i]) for i in filter_goods_valuelist)}
+        from YJgoods.ods_goods_day_report
+        WHERE 货号 in ({','.join((prefix + str(i) + suffix) for i in item_no_re)})
+                and 数据日期 >=date('{start_date}') and 数据日期<= date('{end_date}')
+
+        union all
+        SELECT '更新后' as 状态,货号 ,数据日期,{', '.join((checklist[i]) for i in filter_goods_valuelist)}
+        from YJgoods.ods_goods_day_report_update
+        WHERE 货号 in ({','.join((prefix + str(i) + suffix) for i in item_no_re)})
+                and 数据日期 >=date('{start_date}') and 数据日期<= date('{end_date}')
+
+        limit 500000
+
+        """
+
+    print(f"打印autofetchgoodsfilter-商品维度数据-开始下载中-共点击{n_clicks}次")
+
+    data_autofetch_goods_filter = pd.read_sql(sql_autofetch_cateone_goods_filter, engine_ms)
+
+    csv_string_download_autofetch_filter = data_autofetch_goods_filter.to_csv(index=False, encoding='utf-8')
+    csv_string_download_autofetch_filter = "data:text/csv;charset=utf-8," + urllib.parse.quote(
+        csv_string_download_autofetch_filter)
+
+    print(f'打印autofetchgoodsfilter-商品维度数据-下载完成-共点击{n_clicks}次')
+
+    data_auto_fetch_goods_fig_filter = data_autofetch_goods_filter.head(50)
+
+    fig_auto_fetch_filter_goods = \
+        go.Figure(data=[
+            go.Table(
+                header=
+                dict(values=list(data_auto_fetch_goods_fig_filter.columns),
+                     fill_color='rgb(0, 81, 108)',
+                     line=dict(color='rgb(0, 81, 108)', width=0.5),
+                     align=['left'],
+                     height=20,
+                     font=dict(size=9, family='Microsoft YaHei', color='rgb(255, 255, 255)')),
+                # columnwidth=[10, 10, 4],
+                cells=
+                dict(
+                    values=[
+                        data_auto_fetch_goods_fig_filter[k].tolist()
+                        for k in data_auto_fetch_goods_fig_filter.columns[0:]
+                    ],
+                    # height=18.5,
+                    fill_color='rgb(255, 255, 255)',
+                    line=dict(color='rgb(0, 81, 108)', width=0.5),
+                    align=['left'],
+                    font=dict(size=8, family='Microsoft YaHei')
+                )
+            )
+        ]
+        )
+    fig_auto_fetch_filter_goods.update_layout(
+        autosize=False,
+        # width=1000,
+        # height=615,  # 设置高度
+        title=
+        dict(text=
+             f"筛选货号-下载数据TOP预览",
+             font=dict(family='Microsoft YaHei', size=13),
+             x=0.5, y=0.88)
+    )
+
+    return fig_auto_fetch_filter_goods, csv_string_download_autofetch_filter
+
+
+@app.callback([Output("paragraph-id", "children")],
+              [
+                  Input('value-update-no-button', 'n_clicks')
+              ],
+              [
+                  State('date-picker-range-cate-autofetch', 'start_date'),
+                  State('date-picker-range-cate-autofetch', 'end_date'),
+                  State('item-no-filter', 'value'),
+                  State('value-update-no', 'value'),
+              ])
+def update_table_ca(n_clicks, start_date, end_date,
+                    item_no_filter, value_update_no, ):
+    con_mssql = pymysql.connect("127.0.0.1",
+                                "root",
+                                "yssshushan2008",
+                                "YJgoods",
+                                charset="utf8")
+
+    item_no_re = item_no_filter.split()
+    value_update_no = value_update_no.split()
+
+    prefix = "'"
+    suffix = "'\n"
+
+    sql_update = f"""
+        UPDATE YJgoods.ods_goods_day_report_update
+         SET   {','.join(j for j in value_update_no)}
+              WHERE 货号 in ({','.join((prefix + str(i) + suffix) for i in item_no_re)})
+                    and 数据日期 >=date('{start_date}') and 数据日期<= date('{end_date}')
+        """
+    cur = con_mssql.cursor()
+
+    try:
+        cur.execute(sql_update)
+        con_mssql.commit()
+        print("修改成功")
+        return [f"修改成功{n_clicks}次"]
+
+    except:
+        con_mssql.rollback()
+        print(sql_update)
+        return [f"修改错误,请核对"]
+
+    con_mssql.close()
+
+
+if __name__ == '__main__':
+    app.server.run(port=5002)

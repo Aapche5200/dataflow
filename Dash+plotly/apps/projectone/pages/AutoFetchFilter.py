@@ -17,6 +17,7 @@ from plotly.subplots import make_subplots  # 画子图加载包
 import dash_auth
 import dash
 from pyhive import hive
+import prestodb
 from textwrap import dedent
 import sys
 import urllib
@@ -198,9 +199,13 @@ def update_table_ca(n_clicks, item_no_filter, filter_goods_valuelist):
     global fig_auto_fetch_filter_goods
 
     con_red_atuofetch_goods_filter = \
-        hive.Connection(host="ec2-34-222-53-168.us-west-2.compute.amazonaws.com",
-                        port=10000,
-                        username="hadoop")
+        prestodb.dbapi.connect(
+            host='ec2-54-68-88-224.us-west-2.compute.amazonaws.com',
+            port=80,
+            user='hadoop',
+            catalog='hive',
+            schema='default',
+        )
 
     checklist = {"front_cate_one": 'front_cate_one',
                  "front_cate_two": 'front_cate_two',
@@ -232,7 +237,15 @@ def update_table_ca(n_clicks, item_no_filter, filter_goods_valuelist):
 
     print(f"打印autofetchgoodsfilter-商品维度数据-开始下载中-共点击{n_clicks}次")
 
-    data_autofetch_goods_filter = pd.read_sql(sql_autofetch_cateone_goods_filter, con_red_atuofetch_goods_filter)
+    cursor = con_red_atuofetch_goods_filter.cursor()
+    cursor.execute(sql_autofetch_cateone_goods_filter)
+    data = cursor.fetchall()
+    column_descriptions = cursor.description
+    if data:
+        data_autofetch_goods_filter = pd.DataFrame(data)
+        data_autofetch_goods_filter.columns = [c[0] for c in column_descriptions]
+    else:
+        data_autofetch_goods_filter = pd.DataFrame()
 
     csv_string_download_autofetch_filter = data_autofetch_goods_filter.to_csv(index=False, encoding='utf-8')
     csv_string_download_autofetch_filter = "data:text/csv;charset=utf-8," + urllib.parse.quote(
@@ -280,4 +293,3 @@ def update_table_ca(n_clicks, item_no_filter, filter_goods_valuelist):
     )
 
     return fig_auto_fetch_filter_goods, csv_string_download_autofetch_filter
-

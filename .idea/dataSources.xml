@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="Win-SqlServer" uuid="6f8daa61-088f-4a3d-8f63-2c310d5e7519">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://172.16.92.2:1433;database=master</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Presto" uuid="959eedb8-2c7c-467f-9480-09686f3f7381">
+      <driver-ref>java.sql.Driver</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>com.facebook.presto.jdbc.PrestoDriver</jdbc-driver>
+      <jdbc-url>jdbc:presto://ec2-54-68-88-224.us-west-2.compute.amazonaws.com:80/hive/default</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Mac-Mysql" uuid="61832dc2-45ee-475e-ae89-73217be08c97">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Hive -YJ" uuid="fc02a9e5-6259-4670-87e0-a5a9e07caa14">
+      <driver-ref>0d12fc3c-93cc-4224-badb-bdc4d58ee4b7</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.apache.hive.jdbc.HiveDriver</jdbc-driver>
+      <jdbc-url>jdbc:hive2://175.24.24.12:10008?mapred.job.queue.name=root.operation</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="Presto -YJ" uuid="c191e98a-a52b-4103-ac2b-cba544ff8ca7">
+      <driver-ref>java.sql.Driver</driver-ref>
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>com.facebook.presto.jdbc.PrestoDriver</jdbc-driver>
+      <jdbc-url>jdbc:presto://yunjipresto-wan.yunjiweidian.com:443/hive_idc/default</jdbc-url>
+    </data-source>
+  </component>
+</project>
