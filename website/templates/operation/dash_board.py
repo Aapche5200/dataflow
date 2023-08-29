@@ -213,3 +213,6 @@ def home_charts_three(selected_date):
 
     plot_total_day = fig.to_html(full_html=False)
     return plot_total_day
+
+
+# 仅仅只是为了测试。谢谢
