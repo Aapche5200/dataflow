@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>离线作业-Dataflow</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .popup-content {
+            padding: 20px;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        input:checked + div {
+            display: block;
+        }
+
+        svg {
+            border: 1px solid #d9d9d9;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .node text {
+            font-weight: 500;
+            font-family: sans-serf;
+            font-size: 12px;
+            pointer-events: none;
+            text-anchor: middle;
+            fill: white;
+        }
+
+        .label g {
+            transform: translate(0, -15px);
+        }
+
+        .edgePath path {
+            stroke: #d9d9d9;
+            stroke-width: 2px;
+        }
+
+        g.type-suss > rect {
+            fill: #08287F;
+        }
+
+        g.type-running > rect {
+            fill: #0FDD83;
+        }
+
+        g.type-wait > rect {
+            fill: #AFA33D;
+        }
+
+        g.type-other > rect {
+            fill: #B60000;
+        }
+
+        #legend {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .legend-item {
+            width: 10px;
+            height: 10px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .legend-label {
+            margin-right: 20px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+    <script src="../../static/js/d3.min.js" charset="utf-8"></script>
+    <script src="../../static/js/dagre-d3.js"></script>
+    <script src="../../static/js/diag.js"></script>
+</head>
+<body>
+<div class="popup-content">
+    <form method="post">
+        <div class="radio-container">
+            <input type="submit" value="刷新">
+        </div>
+        <div class="radio-container">
+            <div id="legend">
+                <span class="legend-item" style="background-color: #AFA33D;"></span>
+                <span class="legend-label">等待执行</span>
+                <span class="legend-item" style="background-color:#B60000;"></span>
+                <span class="legend-label">失败</span>
+                <span class="legend-item" style="background-color: #0FDD83;"></span>
+                <span class="legend-label">运行中</span>
+                <span class="legend-item" style="background-color: #08287F;"></span>
+                <span class="legend-label">成功</span>
+            </div>
+        </div>
+        <span class="close-button" onclick="closePopup()">×</span>
+        <!--            把python的值先放在页面,然后再传递给JS-->
+        <div id="state-data" style="display: none;">{{ nodes_list | tojson }}</div>
+        <div id="edg-data" style="display: none;">{{ edges | tojson }}</div>
+        <div>
+            <svg id="svgCanvas" width=1000 height=600></svg>
+            <script id="js">
+                // 获取页面state和edg传递给JavaScript的state
+                var state =
+                    JSON.parse(document.getElementById('state-data').textContent);
+                var edg =
+                    JSON.parse(document.getElementById('edg-data').textContent);
+                // 这里可以使用state和edg的数据进行后续处理或操作
+                console.log(state);
+                console.log(edg);
+                var statePoint = 0; // 当前选中的点
+                diagGraph.init(statePoint, state, edg); //创建关系图
+
+                var svgCanvas = document.getElementById('svgCanvas'); //绑定事件鼠标点击
+                svgCanvas.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    if (e.target.tagName === 'rect') {
+                        diagGraph.changePoint(e.target.parentNode.id);
+                    }
+                })
+            </script>
+        </div>
+    </form>
+</div>
+<script>
+    function closePopup() {
+        window.close();
+    }
+</script>
+</body>
+</html>
+

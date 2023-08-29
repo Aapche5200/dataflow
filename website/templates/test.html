@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* 设置表格容器的样式，限制高度，添加水平滚动条 */
+        .table-container {
+            max-height: 400px;
+            overflow-x: auto;
+            border: 1px solid #ccc;
+        }
+
+        /* 创建一个包含固定列和滚动列的表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* 设置表格头的样式 */
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        /* 设置固定列的样式 */
+        .fixed-column {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #fff;
+        }
+
+        /* 设置滚动列的样式 */
+        .scroll-column {
+            padding-left: 150px; /* 调整滚动列的宽度，使其不重叠固定列 */
+        }
+
+        /* 设置表格内容的样式 */
+        td {
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <!-- 固定列 1 -->
+                    <th class="fixed-column">固定列 1</th>
+                    <!-- 固定列 2 -->
+                    <th class="fixed-column">固定列 2</th>
+                    <!-- 滚动列 1 -->
+                    <th class="scroll-column">滚动列 1</th>
+                    <!-- 滚动列 2 -->
+                    <th class="scroll-column">滚动列 2</th>
+                    <!-- 添加更多滚动列 -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 表格内容，可以根据需要添加更多行和数据 -->
+                <tr>
+                    <td class="fixed-column">数据 1</td>
+                    <td class="fixed-column">数据 2</td>
+                    <td class="scroll-column">数据 3</td>
+                    <td class="scroll-column">数据 4</td>
+                    <!-- 添加更多数据 -->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

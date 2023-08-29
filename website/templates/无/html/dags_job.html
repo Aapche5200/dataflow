@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>作业开发-Dataflow</title>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}添加任务{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">依赖配置</h1>
+        <form action="/dags/html/dags_job" method="post">
+            <label for="source">作业父节点</label>
+            <input type="text" list="sourceList" name="source" id="source">
+            <datalist id="sourceList">
+                {% for item in task_node_message %}
+                <option value="{{ item }}">
+                    {% endfor %}
+            </datalist>
+            <br>
+            <label for="destination">作业子节点</label>
+            <input type="text" list="destinationList" name="destination" id="destination">
+            <datalist id="destinationList">
+                {% for item in task_node_message %}
+                <option value="{{ item }}">
+                    {% endfor %}
+            </datalist>
+            <br>
+            <label for="job_owner">负责人：</label>
+            <input type="text" id="job_owner" name="job_owner">
+            <br>
+            <div class="radio-container">
+                <input type="submit" name="action" value="添加">
+            </div>
+        </form>
+    </div>
+    <div class="field-info">
+        <h1 class="success-title">DAGS</h1>
+        <form action="/dags/html/dags_job" method="post">
+            <div class="button-container">
+                <div class="radio-container">
+                    <input type="submit" name="action" value="确定删除">
+                </div>
+            </div>
+            <table>
+                <tr>
+                    <th>设置</th>
+                    <th>作业序号</th>
+                    <th>作业父节点</th>
+                    <th>作业子节点</th>
+                    <th>负责人</th>
+                </tr>
+                {% for execute_result in dags_job_message %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selected_dagsjobs[]"
+                               value="{{ execute_result[0] }},{{ execute_result[1] }}">
+                    </td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ execute_result[0] }}</td>
+                    <td>{{ execute_result[1] }}</td>
+                    <td>{{ execute_result[2] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+</body>
+</html>

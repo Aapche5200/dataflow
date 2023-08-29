@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dataflow</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/styles_upsl.css">
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}查询数据库{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">查询数据库</h1>
+        <form action="/select" method="post">
+            <label for="job_name">任务名：</label>
+            <input type="text" id="job_name" name="job_name"><br>
+
+            <label for="job_owner">负责人：</label>
+            <input type="text" id="job_owner" name="job_owner"><br>
+
+            <label for="job_result">任务结果：</label>
+            <input type="text" id="job_result" name="job_result"><br>
+
+            <label for="begin_time">开始日期：</label>
+            <input type="date" id="begin_time" name="begin_time"><br>
+
+            <label for="end_time">结束日期：</label>
+            <input type="date" id="end_time" name="end_time"><br>
+
+            <input type="submit" value="查询">
+        </form>
+    </div>
+    <div class="success-container">
+        <h1 class="success-title">查询结果</h1>
+        <table>
+            <tr>
+                <th>任务名</th>
+                <th>SQL语句</th>
+                <th>负责人</th>
+                <th>任务结果</th>
+                <th>同步时间</th>
+            </tr>
+            {% for result in results %}
+            <tr>
+                <td>{{ result[0] }}</td>
+                <td>
+                    <div class="job-sql-container">
+                        <div class="job-sql">{{ result[1] }}</div>
+                    </div>
+                </td>
+                <td>{{ result[2] }}</td>
+                <td>{{ result[3] }}</td>
+                <td>{{ result[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

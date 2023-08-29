@@ -1,0 +1,19 @@
+{
+    "registered_users": {
+        "admin@sss123": "admin@sss123",
+        "SSS": "111",
+        "\u5c39\u4e66\u5c71": "1234567890"
+    },
+    "self_local_mysql": {
+        "Mysql": "//root:root%40sss123@127.0.0.1/job_task"
+    },
+    "gp_test": {
+        "Greenplum": "//python_etl:xFFUfuXDA4e5CVC1@10.20.121.145:5432/report"
+    },
+    "gp_middleground": {
+        "Greenplum": "//python_etl:xFFUfuXDA4e5CVC1@10.20.121.231:5432/report"
+    },
+    "oa": {
+        "SqlServer": "//sjfx:5VvXTWS%nfbPRex1Sb@10.20.120.114:1433/ABV5"
+    }
+}

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            height: 50px;
+            width: 100%;
+            background: #f9f9f9;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 3;
+
+
+        }
+
+        ul {
+            height: 50px;
+            display: flex;
+            list-style: none;
+            /*justify-content: center;*/
+            align-items: center;
+        }
+
+        li {
+            position: relative;
+            text-align: center;
+            width: 150px;
+        }
+
+        li a {
+            text-decoration: none;
+            color: #555;
+            display: block;
+            padding: 10px 20px;
+        }
+
+        a:hover {
+            background-color: #ddd;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            z-index: 3;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+        }
+
+        li:hover .dropdown-content {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition-delay: 0s;
+        }
+
+        .dropdown-content a {
+            padding: 10px 20px;
+            color: #555;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #ddd;
+        }
+
+        .right-text {
+            display: flex; /* 使用 display: flex 实现水平布局 */
+            align-items: center; /* 垂直居中对齐 */
+            font-size: 18px;
+            color: #555;
+            margin-right: 20px;
+            font-family: Animal Crossing, sans-serif; /* 设置动物图标字体 Animal Crossing */
+        }
+
+        .login_welcome {
+            margin-left: auto; /* 使用 margin-left: auto 实现右对齐 */
+        }
+
+        .welcome {
+            font-size: 12px;
+            margin-right: 10px; /* 添加右边距以与退出链接分开 */
+        }
+
+        .logout {
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .logout a {
+            color: #555;
+            text-decoration: none;
+            margin-top: 5px; /* 添加上边距以与欢迎文本分开 */
+        }
+
+        .logout a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <ul>
+        <li>
+            <a href="#">离线开发</a>
+            <div class="dropdown-content">
+                <a href="/offline_task/html/schedule_task">作业开发</a>
+                <a href="/offline_task/html/data_sync">数据同步</a>
+            </div>
+        </li>
+        <!--        <li>-->
+        <!--            <a href="/dags/html/dags_job">依赖关系</a>-->
+        <!--        </li>-->
+        <li>
+            <a href="/property">数据资产</a>
+        </li>
+        <li>
+            <a href="#">运维中心</a>
+            <div class="dropdown-content">
+                <a href="/operation/html/overview">运维大屏</a>
+                <a href="/operation/html/operation">离线作业</a>
+            </div>
+        </li>
+        <li>
+            <a href="#">项目管理</a>
+            <div class="dropdown-content">
+                <a href="/pro_management/html/add_users">添加账户</a>
+                <a href="/pro_management/html/data_source">数据源</a>
+            </div>
+        </li>
+        <li>
+            <a href="/">关于</a>
+        </li>
+        <li>
+            <a href="#">其他任务</a>
+            <div class="dropdown-content">
+                <a href="/select">结果查询</a>
+                <a href="/update">任务更新</a>
+                <a href="/insert">任务添加</a>
+            </div>
+        </li>
+        <li class="right-text"><img
+                src="{{ url_for('static', filename='dataflow.ico') }}">Dataflow
+        </li>
+        <div class="login_welcome">
+            <span class="welcome">欢迎{{ username }}!</span>
+            <span class="logout"><a href="/logout">退出</a></span>
+        </div>
+    </ul>
+</header>
+<h1>{{ title }}</h1>
+{% block content %}{% endblock %}
+</body>
+</html>
+

@@ -1,0 +1,287 @@
+/* 层级样式 */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 10px;
+}
+
+/* 表单样式 */
+.form-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 结果样式 */
+.success-container {
+    flex: 3;
+    background-color: #f9f9f9;
+    padding: 5px;
+}
+
+.form-title {
+    align-self: flex-start;
+    margin-top: 50px;
+}
+
+.success-title {
+    /*margin-bottom: 10px;*/
+    margin-top: 50px;
+}
+
+/* 共享样式 */
+body {
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    margin: 0px 10px 0px 10px;
+}
+
+h1 {
+    margin-bottom: 10px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    /*font-weight: bold;*/
+}
+
+input[type="text"], input[type="date"], input[type="number"] {
+    width: 300px;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+input[type="submit"] {
+    padding: 5px 10px;
+    font-size: 14px;
+    background: linear-gradient(180deg, #4B91F7 0%, #367AF6 100%);
+
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+input[type="submit"]:hover {
+    box-shadow: inset 0px 0.8px 0px -0.25px rgba(255, 255, 255, 0.2),
+    0px 0.5px 1.5px rgba(54, 122, 246, 0.25),
+    0px 0px 0px 3.5px rgba(58, 108, 217, 0.5);
+    outline: 0;
+}
+
+.sql-textarea {
+    width: 300px;
+    height: 150px;
+    padding: 5px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: auto;
+    resize: vertical;
+}
+
+.table-container {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: scroll;
+    height: 600px;
+}
+
+/*表格样式共享*/
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 5px 10px;;
+    text-align: left;
+    white-space: nowrap;
+    /*overflow: hidden;*/
+    /*text-overflow: ellipsis;*/
+    /*max-width: 300px;*/
+}
+
+th {
+    background-color: #f2f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    /*font-weight: bold;*/
+}
+
+
+td:first-child,
+td:nth-child(2) {
+    position: sticky;
+    left: 0;
+    top: 0;
+    background-color: #f9f9f9; /* Optional: Add a background color */
+    z-index: 2; /* Ensure it appears above other columns */
+}
+
+th:first-child,
+th:nth-child(2) {
+    position: sticky;
+    left: 0;
+    top: 0;
+    background-color: #f2f2f2; /* Optional: Add a background color */
+    z-index: 3; /* Ensure it appears above other columns */
+}
+
+tr:nth-child(odd) td {
+    background-color: #ffffff /* 奇数行的背景颜色 */
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/*sql列单独设置*/
+.job-sql-container {
+    max-height: 100px;
+    overflow: auto;
+}
+
+.job-sql {
+    white-space: pre-line;
+    width: fit-content;
+}
+
+/*超链接样式*/
+a.table-link {
+    font-family: inherit;
+    font-size: inherit;
+    color: #000000; /* 设置链接颜色，可以根据需要进行调整 */
+    text-decoration: none;
+}
+
+a.table-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.left-column {
+    flex: 1;
+    max-width: 70%;
+}
+
+.right-column {
+    flex: 1;
+    /*max-width: 1200px;*/
+    margin-left: 20px;
+}
+
+
+.field-info {
+    height: 150px;
+}
+
+.field-info-small {
+    height: 150px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.field-info-middle {
+    height: 100px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+}
+
+.field-info-big {
+    height: 100%;
+    overflow-x: auto;
+}
+
+/*设置整个翻页的功能样式*/
+.pagination input[type="number"] {
+    font-size: 12px;
+    padding: 2px 5px;
+    width: 30px;
+}
+
+/*首页区块显示*/
+.stats-container {
+    background-color: #f0f0f0;
+    padding: 5px;
+}
+
+.stat-wrapper {
+    display: flex;
+}
+
+.stat {
+    flex: 1;
+    background-color: #d9d9d9;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-right: 100px;
+}
+
+/*显示一行*/
+.button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.radio-container {
+    display: inline-block;
+}
+
+.radio-container—right {
+    text-align: right;
+}
+
+.wrap {
+    margin: 20px auto;
+    /*width: 403px;*/
+    /*height: 600px;*/
+    /*border:1px solid brown;*/
+    position: relative;
+}
+
+.optionsContainer {
+    display: none;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: #fff;
+    z-index: 3;
+}
+
+.option {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.searchable {
+    position: relative;
+}
+
+.search-icon {
+    display: none;
+}
+
+.selectedOptions {
+    width: 200px;
+    min-height: 20px; /* Set a minimum height for the initial state */
+    height: 20px; /* Set a maximum height for the expanded state */
+    overflow-y: auto;
+    resize: none; /* Disable manual resizing */
+    top: 0; /* Position it at the top of the td */
+    left: 0; /* Align it with the left of the td */
+}

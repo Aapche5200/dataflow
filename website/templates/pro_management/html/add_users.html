@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户</title>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}添加任务{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">添加用户</h1>
+        <form action="/pro_management/html/add_users" method="post" id="form_sync">
+            <label for="username">用户名</label>
+            <input id="username" name="username">
+            <label for="password">输入密码</label>
+            <input type="password" id="password" name="password">
+            <label for="affirm_password">确认密码</label>
+            <input type="password" id="affirm_password" name="affirm_password">
+            <br>
+            {% if message %}
+            <p>{{ message }}</p>
+            {% endif %}
+            <div class="radio-container">
+                <input type="submit" name="action" value="添加">
+            </div>
+            <div class="radio-container">
+                <input type="submit" name="action" value="更新">
+            </div>
+        </form>
+    </div>
+    <div class="field-info">
+        <h1 class="success-title">用户列表</h1>
+        <form action="/pro_management/html/add_users" method="post">
+            <div class="button-container">
+                <div class="radio-container">
+                    <input type="submit" name="action" value="确定删除">
+                </div>
+            </div>
+            <table>
+                <tr>
+                    <th>设置状态</th>
+                    <th>用户名</th>
+                </tr>
+                {% for user in user_list %}
+                <tr>
+                    <td>{% if loop.index == 1 %}
+                        <input type="checkbox" name="selected_user[]" value="{{ user }}"
+                               disabled>
+                        {% else %}
+                        <input type="checkbox" name="selected_user[]"
+                               value="{{ user }}">
+                        {% endif %}
+                    </td>
+                    <td>{{ user }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </form>
+    </div>
+</div>
+{% endblock %}
+</body>
+</html>

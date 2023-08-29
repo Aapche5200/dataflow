@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>数据资产-Dataflow</title>
+    <style type="text/css">
+        input:checked + div {
+            display: block;
+        }
+
+        svg {
+            border: 1px solid #d9d9d9;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .node text {
+            font-weight: 500;
+            font-family: sans-serf;
+            font-size: 12px;
+            pointer-events: none;
+            text-anchor: middle;
+            fill: white;
+        }
+
+        .label g {
+            transform: translate(0, -15px);
+        }
+
+        .edgePath path {
+            stroke: #d9d9d9;
+            stroke-width: 2px;
+        }
+
+        g.type-suss > rect {
+            fill: #08287F;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../static/css/styles_upsl.css">
+    <script>
+        function filterTable() {
+            var input = document.getElementById("search-input");
+            var filter = input.value.toUpperCase();
+            var table = document.getElementById("table-list");
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 0; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[1];
+                if (td) {
+                    var txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../static/js/pagination.js"></script>
+    <script src="../static/js/d3.min.js" charset="utf-8"></script>
+    <script src="../static/js/dagre-d3.js"></script>
+    <script src="../static/js/diag.js"></script>
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}查询数据库{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="left-column">
+        <div class="field-info">
+            <h1 class="form-title">数据表管理</h1>
+            <form action="/property">
+                <input type="text" id="search-input" placeholder="输入表名"
+                       onkeyup="filterTable()">
+                <input type="submit" value="搜索">
+            </form>
+        </div>
+
+        <div class="field-info">
+            <h1>资产列表</h1>
+            <table id="table-list">
+                <tr>
+                    <th>序号</th>
+                    <th>表名名称</th>
+                </tr>
+                {% for table_name in table_names %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td><a href="/property/{{ table_name }}" class="table-link">{{
+                        table_name }}</a></td>
+                </tr>
+
+                {% endfor %}
+            </table>
+            <div class="pagination">
+                <button id="table-list-prev-button"
+                        onclick="goToPreviousPage('table-list')">上一页
+                </button>
+                <span id="table-list-current-page-label">1</span> / <span
+                    id="table-list-total-pages-label">1</span>
+                <button id="table-list-next-button" onclick="goToNextPage('table-list')">
+                    下一页
+                </button>
+                跳转到第<input type="number" id="table-list-jump-input" min="1" max="1"
+                               onchange="jumpToPage('table-list', this.value)">页
+                <button onclick="jumpToPage('table-list', document.getElementById('table-list-jump-input').value)">
+                    GO
+                </button>
+            </div>
+        </div>
+    </div>
+    {% if table_details %}
+    <div class="right-column">
+        <div class="field-info">
+            <h1 class="success-title">表基本信息</h1>
+            <p><strong>表名:</strong> {{ table_details[0] }}</p>
+            <p><strong>表描述:</strong> {{ table_details[1] }}</p>
+            <p><strong>负责人:</strong> {{ table_details[2] }}</p>
+        </div>
+        <div class="field-info">
+            <h1>字段信息</h1>
+            <div>
+                <table id="field-info">
+                    <tr>
+                        <th>序号</th>
+                        <th>字段名</th>
+                        <th>注释</th>
+                        <th>字段类型</th>
+                    </tr>
+                    {% for column in table_columns %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ column[0] }}</td>
+                        <td>{{ column[1] }}</td>
+                        <td>{{ column[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div class="pagination">
+                    <button id="field-info-prev-button"
+                            onclick="goToPreviousPage('field-info')">上一页
+                    </button>
+                    <span id="field-info-current-page-label">1</span> / <span
+                        id="field-info-total-pages-label">1</span>
+                    <button id="field-info-next-button"
+                            onclick="goToNextPage('field-info')">
+                        下一页
+                    </button>
+                    跳转到第<input type="number" id="field-info-jump-input" min="1"
+                                   max="1"
+                                   onchange="jumpToPage('field-info', this.value)">页
+                    <button onclick="jumpToPage('field-info', document.getElementById('field-info-jump-input').value)">
+                        GO
+                    </button>
+                </div>
+            </div>
+            <h1>血缘关系</h1>
+            <!--            把python的值先放在页面,然后再传递给JS-->
+            <div id="state-data" style="display: none;">{{ nodes_list | tojson }}</div>
+            <div id="edg-data" style="display: none;">{{ edges | tojson }}</div>
+            <div>
+                <svg id="svgCanvas" width=90% height=600 style="margin-left: 5px"></svg>
+                <script id="js">
+                    // 获取页面state和edg传递给JavaScript的state
+                    var state =
+                        JSON.parse(document.getElementById('state-data').textContent);
+                    var edg =
+                        JSON.parse(document.getElementById('edg-data').textContent);
+                    // 这里可以使用state和edg的数据进行后续处理或操作
+                    console.log(state);
+                    console.log(edg);
+                    var statePoint = 0; // 当前选中的点
+                    diagGraph.init(statePoint, state, edg); //创建关系图
+
+                    var svgCanvas = document.getElementById('svgCanvas'); //绑定事件鼠标点击
+                    svgCanvas.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        if (e.target.tagName === 'rect') {
+                            diagGraph.changePoint(e.target.parentNode.id);
+                        }
+                    })
+                </script>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script>
+    paginateTable('table-list', 1, 10);
+    paginateTable('field-info', 1, 10);
+
+    function jumpToPage(tableId, pageNumber) {
+        var totalPages = parseInt(document.getElementById(tableId + "-total-pages-label").textContent);
+        pageNumber = parseInt(pageNumber);
+
+        if (pageNumber >= 1 && pageNumber <= totalPages) {
+            paginateTable(tableId, pageNumber, 10);
+        } else {
+            alert("请输入有效的页码！");
+        }
+    }
+</script>
+{% endblock %}
+</body>
+</html>
+

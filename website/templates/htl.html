@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>作业开发-Dataflow</title>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+    <script src="../../static/js/search_more.js"></script>
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}添加任务{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">作业开发</h1>
+        <form action="/htl" method="post">
+            <label for="job_name">任务名：</label>
+            <input type="text" id="job_name" name="job_name" required><br>
+            <label for="databaseSelect1">数据源：</label>
+            <input type="text" list="databaseList1" name="databaseSelect1"
+                   placeholder="---请选择(必填)---"
+                   id="databaseSelect1">
+            <datalist id="databaseList1">
+                <script src="../../static/js/option_get_json.js"></script>
+            </datalist>
+            <br>
+            <label for="job_level">任务等级：</label>
+            <input type="text" list="job_levelList" name="job_level"
+                   placeholder="---请选择(必填)---"
+                   id="job_level">
+            <datalist id="job_levelList">
+                <option value="ODS">ODS</option>
+                <option value="DWD">DWD</option>
+                <option value="DWS">DWS</option>
+                <option value="DIM">DIM</option>
+                <option value="ADS">ADS</option>
+                <option value="DW">DW</option>
+            </datalist>
+            <label for="level_sort">任务顺序：</label>
+            <input type="number" id="level_sort" name="level_sort"><br>
+
+            <label for="job_sql">SQL语句：</label>
+            <textarea id="job_sql" name="job_sql" class="sql-textarea"></textarea><br>
+
+            <label for="job_desc">任务描述：</label>
+            <input type="text" id="job_desc" name="job_desc"><br>
+
+            <label for="job_owner">负责人：</label>
+            <input type="text" list="job_ownerList" name="job_owner"
+                   placeholder="---请选择(必填)---"
+                   id="job_owner">
+            <datalist id="job_ownerList">
+                {% for user in user_list_quote %}
+                <option value="{{ user }}">{{ user }}</option>
+                {% endfor %}
+            </datalist>
+            <br>
+            <label for="task_frequency">同步频率:</label>
+            <div class="radio-container">
+                <input type="radio" id="daily" name="task_frequency" value="按天"
+                       required></div>
+            <div class="radio-container">
+                <label for="daily">按天</label></div>
+            <br>
+            <div class="radio-container">
+                <input type="radio" id="blanking" name="task_frequency" value="实时">
+            </div>
+            <div class="radio-container">
+                <label for="blanking">实时</label>
+            </div>
+            <br>
+            <div class="radio-container">
+                <label for="task_time">调度时间:</label></div>
+            <div class="radio-container">
+                <input type="time" id="task_time" name="task_time" required>
+            </div>
+            <br>
+            <div class="radio-container">
+                <input type="submit" name="action" value="添加">
+            </div>
+            <div class="radio-container">
+                <input type="submit" name="action" value="更新">
+            </div>
+        </form>
+    </div>
+    <div class="field-info-big">
+        <h1 class="success-title">任务列表</h1>
+        <form action="/htl" method="post">
+            作业名称 <input type="text" id="search-task-input-col1"
+                            onkeyup="filterTable('search-task-input-col1', 'offline_task_list', 1)"
+                            placeholder="Search">
+            调度状态 <input type="text" id="search-task-input-col3"
+                            onkeyup="filterTable('search-task-input-col3', 'offline_task_list', 4)"
+                            placeholder="Search">
+            <button onclick="clearSearch('offline_task_list',);
+                                event.preventDefault();">重置
+            </button>
+            <button onclick="executeSearch('offline_task_list',);
+                                event.preventDefault();">搜索
+            </button>
+            <div id="combined-results" style="display: none;"></div>
+            <br>
+            <br>
+            <hr>
+            <div class="button-container">
+                <div class="radio-container">
+                    <input type="submit" name="action" value="启用">
+                    <input type="submit" name="action" value="停用">
+                    <input type="submit" name="action" value="确定删除">
+                </div>
+                <div class="radio-container—right">
+                    <input type="submit" name="action" value="立即执行">
+                    <input type="submit" name="action" value="提交任务">
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="offline_task_list">
+                    <tr>
+                        <th>设置状态</th>
+                        <th>任务名</th>
+                        <th>代码</th>
+                        <th>任务描述</th>
+                        <th>调度状态</th>
+                        <th>负责人</th>
+                        <th>数据库</th>
+                        <th>任务等级</th>
+                        <th>调度频率</th>
+                        <th>调度时间</th>
+                        <th>配置依赖</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for execute_result in execute_message %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_jobs[]"
+                                   value="{{ execute_result[0] }}">
+                        </td>
+                        <td>{{ execute_result[0] }}</td>
+                        <td>
+                            <div class="job-sql-container">
+                                <div class="job-sql">{{ execute_result[1] }}</div>
+                            </div>
+                        </td>
+                        <td>{{ execute_result[2] }}</td>
+                        <td>{{ execute_result[3] }}</td>
+                        <td>{{ execute_result[4] }}</td>
+                        <td>{{ execute_result[5] }}</td>
+                        <td>{{ execute_result[6] }}</td>
+                        <td>{{ execute_result[7] }}</td>
+                        <td>{{ execute_result[8] }}</td>
+                        <form method="post">
+                            <td style="vertical-align: top;">
+                                <div class="searchable">
+                                    <input type="hidden" name="task_name"
+                                           id="task_name"
+                                           value="{{ execute_result[0] }}">
+                                    <input class="selectedOptions search-input"
+                                           id="dependencies"
+                                           name="dependencies"
+                                           readonly>
+                                    <br>
+                                    {% for result_node in result_nodes %}
+                                    {% if result_node[1] == execute_result[0] %}
+                                    {{ result_node[0]|safe }}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="optionsContainer">
+                                        <input type="text"
+                                               class="search-input searchInput"
+                                               placeholder="搜索选项">
+                                        {% for option in node_lists %}
+                                        {% if option != execute_result[0] %}
+                                        <div class="option">
+                                            <input type="checkbox" class="checkboxOption"
+                                                   value="{{ option }}"
+                                                   {% for result_node in result_nodes %}
+                                                   {% if result_node[1]== execute_result[0] %}
+                                                   {% for option_reslt in result_node[0].split('<br>')%}
+                                                   {% if option_reslt == option %}
+                                                   checked
+                                                   {%endif %}
+                                                   {% endfor %}
+                                                   {% endif %}
+                                                   {% endfor %}
+                                            > {{ option }}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="search-icon searchIcon">&#128269;</div>
+                                </div>
+                            </td>
+                            <td style="vertical-align: top;">
+
+                                <div>
+                                    <!-- onclick="event.preventDefault();"
+                                                  <button class="cancelButton">取消</button>-->
+                                    <button class="editButton"
+                                            onclick="event.preventDefault();">
+                                        编辑
+                                    </button>
+                                    <button class="saveButton"
+                                            type="submit"
+                                            name="save_button">
+                                        保存
+                                    </button>
+                                    <button class="cancelButton"
+                                            onclick="event.preventDefault();"
+                                            name="cancelButton">
+                                        取消
+                                    </button>
+
+                                </div>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="../../static/js/edit_nodes.js"></script>
+{% endblock %}
+</body>
+</html>

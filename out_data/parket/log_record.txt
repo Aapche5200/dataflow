@@ -1,0 +1,2093 @@
+[2023-08-08 03:30:31] [ERROR] >>>  Main program error:
+[2023-08-08 03:30:31] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-08 03:30:31] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-08 03:30:31] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-09 03:30:06 CST)" executed successfully
+[2023-08-08 04:00:06] [DEBUG] >>>  Looking for jobs to run
+[2023-08-08 04:00:06] [DEBUG] >>>  Next wakeup is due at 2023-08-09 01:00:07.492793+08:00 (in 75601.246876 seconds)
+[2023-08-08 04:00:06] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-09 04:00:00 CST)" (scheduled at 2023-08-08 04:00:06.239315+08:00)
+[2023-08-08 04:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-09 04:00:00 CST)" executed successfully
+[2023-08-09 01:00:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-09 01:00:07] [DEBUG] >>>  Next wakeup is due at 2023-08-09 02:00:05.850630+08:00 (in 3598.145260 seconds)
+[2023-08-09 01:00:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-10 01:00:04 CST)" (scheduled at 2023-08-09 01:00:07.492793+08:00)
+[2023-08-09 01:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-10 01:00:04 CST)" executed successfully
+[2023-08-09 02:00:05] [DEBUG] >>>  Looking for jobs to run
+[2023-08-09 02:00:05] [DEBUG] >>>  Next wakeup is due at 2023-08-09 03:30:06.820432+08:00 (in 5400.955429 seconds)
+[2023-08-09 02:00:05] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-10 02:00:07 CST)" (scheduled at 2023-08-09 02:00:05.850630+08:00)
+[2023-08-09 02:00:05] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-10 02:00:07 CST)" executed successfully
+[2023-08-09 03:30:06] [DEBUG] >>>  Looking for jobs to run
+[2023-08-09 03:30:06] [DEBUG] >>>  Next wakeup is due at 2023-08-09 04:00:00.360525+08:00 (in 1793.521995 seconds)
+[2023-08-09 03:30:06] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-10 03:30:40 CST)" (scheduled at 2023-08-09 03:30:06.820432+08:00)
+[2023-08-09 03:30:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-10 03:30:40 CST)" executed successfully
+[2023-08-09 04:00:00] [DEBUG] >>>  Looking for jobs to run
+[2023-08-09 04:00:00] [DEBUG] >>>  Next wakeup is due at 2023-08-10 01:00:04.504052+08:00 (in 75604.136127 seconds)
+[2023-08-09 04:00:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-10 04:00:12 CST)" (scheduled at 2023-08-09 04:00:00.360525+08:00)
+[2023-08-09 04:00:03] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-10 04:00:12 CST)" executed successfully
+[2023-08-10 01:00:04] [DEBUG] >>>  Looking for jobs to run
+[2023-08-10 01:00:04] [DEBUG] >>>  Next wakeup is due at 2023-08-10 02:00:07.314986+08:00 (in 3602.599916 seconds)
+[2023-08-10 01:00:04] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-11 01:00:01 CST)" (scheduled at 2023-08-10 01:00:04.504052+08:00)
+[2023-08-10 01:00:04] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-11 01:00:01 CST)" executed successfully
+[2023-08-10 02:00:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-10 02:00:07] [DEBUG] >>>  Next wakeup is due at 2023-08-10 03:30:40.145300+08:00 (in 5432.816554 seconds)
+[2023-08-10 02:00:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-11 02:00:14 CST)" (scheduled at 2023-08-10 02:00:07.314986+08:00)
+[2023-08-10 02:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-11 02:00:14 CST)" executed successfully
+[2023-08-10 03:30:40] [DEBUG] >>>  Looking for jobs to run
+[2023-08-10 03:30:40] [DEBUG] >>>  Next wakeup is due at 2023-08-10 04:00:12.833722+08:00 (in 1772.671516 seconds)
+[2023-08-10 03:30:40] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-11 03:30:27 CST)" (scheduled at 2023-08-10 03:30:40.145300+08:00)
+[2023-08-10 03:30:42] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-11 03:30:27 CST)" executed successfully
+[2023-08-10 04:00:12] [DEBUG] >>>  Looking for jobs to run
+[2023-08-10 04:00:12] [DEBUG] >>>  Next wakeup is due at 2023-08-11 01:00:01.787577+08:00 (in 75588.946407 seconds)
+[2023-08-10 04:00:12] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-11 04:00:05 CST)" (scheduled at 2023-08-10 04:00:12.833722+08:00)
+[2023-08-10 04:00:17] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-11 04:00:05 CST)" executed successfully
+[2023-08-11 01:00:01] [DEBUG] >>>  Looking for jobs to run
+[2023-08-11 01:00:02] [DEBUG] >>>  Next wakeup is due at 2023-08-11 02:00:14.798734+08:00 (in 3612.797526 seconds)
+[2023-08-11 01:00:02] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-12 01:00:01 CST)" (scheduled at 2023-08-11 01:00:01.787577+08:00)
+[2023-08-11 01:00:02] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-12 01:00:01 CST)" executed successfully
+[2023-08-11 02:00:14] [DEBUG] >>>  Looking for jobs to run
+[2023-08-11 02:00:14] [DEBUG] >>>  Next wakeup is due at 2023-08-11 03:30:27.180775+08:00 (in 5412.369867 seconds)
+[2023-08-11 02:00:14] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-12 02:00:08 CST)" (scheduled at 2023-08-11 02:00:14.798734+08:00)
+[2023-08-11 02:00:14] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-12 02:00:08 CST)" executed successfully
+[2023-08-11 03:30:27] [DEBUG] >>>  Looking for jobs to run
+[2023-08-11 03:30:27] [DEBUG] >>>  Next wakeup is due at 2023-08-11 04:00:05.254354+08:00 (in 1778.064540 seconds)
+[2023-08-11 03:30:27] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-12 03:30:46 CST)" (scheduled at 2023-08-11 03:30:27.180775+08:00)
+[2023-08-11 03:30:27] [ERROR] >>>  Main program error:
+[2023-08-11 03:30:27] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-11 03:30:27] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-11 03:30:27] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-12 03:30:46 CST)" executed successfully
+[2023-08-11 04:00:05] [DEBUG] >>>  Looking for jobs to run
+[2023-08-11 04:00:05] [DEBUG] >>>  Next wakeup is due at 2023-08-12 01:00:01.945555+08:00 (in 75596.686768 seconds)
+[2023-08-11 04:00:05] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-12 04:00:01 CST)" (scheduled at 2023-08-11 04:00:05.254354+08:00)
+[2023-08-11 04:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-12 04:00:01 CST)" executed successfully
+[2023-08-12 01:00:02] [DEBUG] >>>  Looking for jobs to run
+[2023-08-12 01:00:02] [DEBUG] >>>  Next wakeup is due at 2023-08-12 02:00:08.924458+08:00 (in 3606.835776 seconds)
+[2023-08-12 01:00:02] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-13 01:00:04 CST)" (scheduled at 2023-08-12 01:00:01.945555+08:00)
+[2023-08-12 01:00:02] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-13 01:00:04 CST)" executed successfully
+[2023-08-12 02:00:08] [DEBUG] >>>  Looking for jobs to run
+[2023-08-12 02:00:08] [DEBUG] >>>  Next wakeup is due at 2023-08-12 03:30:46.710401+08:00 (in 5437.773415 seconds)
+[2023-08-12 02:00:08] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-13 02:00:10 CST)" (scheduled at 2023-08-12 02:00:08.924458+08:00)
+[2023-08-12 02:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-13 02:00:10 CST)" executed successfully
+[2023-08-12 03:30:46] [DEBUG] >>>  Looking for jobs to run
+[2023-08-12 03:30:46] [DEBUG] >>>  Next wakeup is due at 2023-08-12 04:00:01.142618+08:00 (in 1754.420807 seconds)
+[2023-08-12 03:30:46] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-13 03:30:45 CST)" (scheduled at 2023-08-12 03:30:46.710401+08:00)
+[2023-08-12 03:30:46] [ERROR] >>>  Main program error:
+[2023-08-12 03:30:46] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-12 03:30:46] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-12 03:30:46] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-13 03:30:45 CST)" executed successfully
+[2023-08-12 04:00:01] [DEBUG] >>>  Looking for jobs to run
+[2023-08-12 04:00:01] [DEBUG] >>>  Next wakeup is due at 2023-08-13 01:00:04.248117+08:00 (in 75603.099269 seconds)
+[2023-08-12 04:00:01] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-13 04:00:11 CST)" (scheduled at 2023-08-12 04:00:01.142618+08:00)
+[2023-08-12 04:00:05] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-13 04:00:11 CST)" executed successfully
+[2023-08-13 01:00:04] [DEBUG] >>>  Looking for jobs to run
+[2023-08-13 01:00:04] [DEBUG] >>>  Next wakeup is due at 2023-08-13 02:00:10.134132+08:00 (in 3605.750332 seconds)
+[2023-08-13 01:00:04] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-14 01:00:07 CST)" (scheduled at 2023-08-13 01:00:04.248117+08:00)
+[2023-08-13 01:00:04] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-14 01:00:07 CST)" executed successfully
+[2023-08-13 02:00:10] [DEBUG] >>>  Looking for jobs to run
+[2023-08-13 02:00:10] [DEBUG] >>>  Next wakeup is due at 2023-08-13 03:30:45.451820+08:00 (in 5435.307105 seconds)
+[2023-08-13 02:00:10] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-14 02:00:05 CST)" (scheduled at 2023-08-13 02:00:10.134132+08:00)
+[2023-08-13 02:00:10] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-14 02:00:05 CST)" executed successfully
+[2023-08-13 03:30:45] [DEBUG] >>>  Looking for jobs to run
+[2023-08-13 03:30:45] [DEBUG] >>>  Next wakeup is due at 2023-08-13 04:00:11.078943+08:00 (in 1765.615432 seconds)
+[2023-08-13 03:30:45] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-14 03:30:33 CST)" (scheduled at 2023-08-13 03:30:45.451820+08:00)
+[2023-08-13 03:30:45] [ERROR] >>>  Main program error:
+[2023-08-13 03:30:45] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-13 03:30:45] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-13 03:30:45] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-14 03:30:33 CST)" executed successfully
+[2023-08-13 04:00:11] [DEBUG] >>>  Looking for jobs to run
+[2023-08-13 04:00:11] [DEBUG] >>>  Next wakeup is due at 2023-08-14 01:00:07.171770+08:00 (in 75596.087852 seconds)
+[2023-08-13 04:00:11] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-14 04:00:05 CST)" (scheduled at 2023-08-13 04:00:11.078943+08:00)
+[2023-08-13 04:00:13] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-14 04:00:05 CST)" executed successfully
+[2023-08-14 01:00:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-14 01:00:07] [DEBUG] >>>  Next wakeup is due at 2023-08-14 02:00:05.500077+08:00 (in 3598.190375 seconds)
+[2023-08-14 01:00:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-15 01:00:01 CST)" (scheduled at 2023-08-14 01:00:07.171770+08:00)
+[2023-08-14 01:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-15 01:00:01 CST)" executed successfully
+[2023-08-14 02:00:05] [DEBUG] >>>  Looking for jobs to run
+[2023-08-14 02:00:05] [DEBUG] >>>  Next wakeup is due at 2023-08-14 03:30:33.443740+08:00 (in 5427.931422 seconds)
+[2023-08-14 02:00:05] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-15 02:00:13 CST)" (scheduled at 2023-08-14 02:00:05.500077+08:00)
+[2023-08-14 02:00:05] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-15 02:00:13 CST)" executed successfully
+[2023-08-14 03:30:33] [DEBUG] >>>  Looking for jobs to run
+[2023-08-14 03:30:33] [DEBUG] >>>  Next wakeup is due at 2023-08-14 04:00:05.857273+08:00 (in 1772.400977 seconds)
+[2023-08-14 03:30:33] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-15 03:30:07 CST)" (scheduled at 2023-08-14 03:30:33.443740+08:00)
+[2023-08-14 03:30:35] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-15 03:30:07 CST)" executed successfully
+[2023-08-14 04:00:05] [DEBUG] >>>  Looking for jobs to run
+[2023-08-14 04:00:05] [DEBUG] >>>  Next wakeup is due at 2023-08-15 01:00:01.739574+08:00 (in 75595.876708 seconds)
+[2023-08-14 04:00:05] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-15 04:00:14 CST)" (scheduled at 2023-08-14 04:00:05.857273+08:00)
+[2023-08-14 04:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-15 04:00:14 CST)" executed successfully
+[2023-08-15 01:00:01] [DEBUG] >>>  Looking for jobs to run
+[2023-08-15 01:00:01] [DEBUG] >>>  Next wakeup is due at 2023-08-15 02:00:13.320289+08:00 (in 3611.445322 seconds)
+[2023-08-15 01:00:01] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-16 01:00:03 CST)" (scheduled at 2023-08-15 01:00:01.739574+08:00)
+[2023-08-15 01:00:01] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-16 01:00:03 CST)" executed successfully
+[2023-08-15 02:00:13] [DEBUG] >>>  Looking for jobs to run
+[2023-08-15 02:00:13] [DEBUG] >>>  Next wakeup is due at 2023-08-15 03:30:07.730457+08:00 (in 5394.399955 seconds)
+[2023-08-15 02:00:13] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-16 02:00:12 CST)" (scheduled at 2023-08-15 02:00:13.320289+08:00)
+[2023-08-15 02:00:13] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-16 02:00:12 CST)" executed successfully
+[2023-08-15 03:30:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-15 03:30:07] [DEBUG] >>>  Next wakeup is due at 2023-08-15 04:00:14.948790+08:00 (in 1807.208066 seconds)
+[2023-08-15 03:30:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-16 03:30:10 CST)" (scheduled at 2023-08-15 03:30:07.730457+08:00)
+[2023-08-15 03:30:07] [ERROR] >>>  Main program error:
+[2023-08-15 03:30:07] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-15 03:30:07] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-15 03:30:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-16 03:30:10 CST)" executed successfully
+[2023-08-15 04:00:14] [DEBUG] >>>  Looking for jobs to run
+[2023-08-15 04:00:14] [DEBUG] >>>  Next wakeup is due at 2023-08-16 01:00:03.288060+08:00 (in 75588.334918 seconds)
+[2023-08-15 04:00:14] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-16 04:00:15 CST)" (scheduled at 2023-08-15 04:00:14.948790+08:00)
+[2023-08-15 04:00:17] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-16 04:00:15 CST)" executed successfully
+[2023-08-16 01:00:03] [DEBUG] >>>  Looking for jobs to run
+[2023-08-16 01:00:03] [DEBUG] >>>  Next wakeup is due at 2023-08-16 02:00:12.725750+08:00 (in 3609.304039 seconds)
+[2023-08-16 01:00:03] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-17 01:00:00 CST)" (scheduled at 2023-08-16 01:00:03.288060+08:00)
+[2023-08-16 01:00:03] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-17 01:00:00 CST)" executed successfully
+[2023-08-16 02:00:12] [DEBUG] >>>  Looking for jobs to run
+[2023-08-16 02:00:12] [DEBUG] >>>  Next wakeup is due at 2023-08-16 03:30:10.969220+08:00 (in 5398.230847 seconds)
+[2023-08-16 02:00:12] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-17 02:00:00 CST)" (scheduled at 2023-08-16 02:00:12.725750+08:00)
+[2023-08-16 02:00:12] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-17 02:00:00 CST)" executed successfully
+[2023-08-16 03:30:10] [DEBUG] >>>  Looking for jobs to run
+[2023-08-16 03:30:10] [DEBUG] >>>  Next wakeup is due at 2023-08-16 04:00:15.534596+08:00 (in 1804.554957 seconds)
+[2023-08-16 03:30:10] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-17 03:30:47 CST)" (scheduled at 2023-08-16 03:30:10.969220+08:00)
+[2023-08-16 03:30:12] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-17 03:30:47 CST)" executed successfully
+[2023-08-16 04:00:15] [DEBUG] >>>  Looking for jobs to run
+[2023-08-16 04:00:15] [DEBUG] >>>  Next wakeup is due at 2023-08-17 01:00:00.147890+08:00 (in 75584.608122 seconds)
+[2023-08-16 04:00:15] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-17 04:00:06 CST)" (scheduled at 2023-08-16 04:00:15.534596+08:00)
+[2023-08-16 04:00:19] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-17 04:00:06 CST)" executed successfully
+[2023-08-17 01:00:00] [DEBUG] >>>  Looking for jobs to run
+[2023-08-17 01:00:00] [DEBUG] >>>  Next wakeup is due at 2023-08-17 02:00:00.641096+08:00 (in 3600.347206 seconds)
+[2023-08-17 01:00:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-18 01:00:07 CST)" (scheduled at 2023-08-17 01:00:00.147890+08:00)
+[2023-08-17 01:00:00] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-18 01:00:07 CST)" executed successfully
+[2023-08-17 02:00:00] [DEBUG] >>>  Looking for jobs to run
+[2023-08-17 02:00:00] [DEBUG] >>>  Next wakeup is due at 2023-08-17 03:30:47.010140+08:00 (in 5446.355468 seconds)
+[2023-08-17 02:00:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-18 02:00:11 CST)" (scheduled at 2023-08-17 02:00:00.641096+08:00)
+[2023-08-17 02:00:00] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-18 02:00:11 CST)" executed successfully
+[2023-08-17 03:30:47] [DEBUG] >>>  Looking for jobs to run
+[2023-08-17 03:30:47] [DEBUG] >>>  Next wakeup is due at 2023-08-17 04:00:06.230881+08:00 (in 1759.210145 seconds)
+[2023-08-17 03:30:47] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-18 03:30:18 CST)" (scheduled at 2023-08-17 03:30:47.010140+08:00)
+[2023-08-17 03:30:49] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-18 03:30:18 CST)" executed successfully
+[2023-08-17 04:00:06] [DEBUG] >>>  Looking for jobs to run
+[2023-08-17 04:00:06] [DEBUG] >>>  Next wakeup is due at 2023-08-18 01:00:07.008517+08:00 (in 75600.771853 seconds)
+[2023-08-17 04:00:06] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-18 04:00:00 CST)" (scheduled at 2023-08-17 04:00:06.230881+08:00)
+[2023-08-17 04:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-18 04:00:00 CST)" executed successfully
+[2023-08-18 01:00:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-18 01:00:07] [DEBUG] >>>  Next wakeup is due at 2023-08-18 02:00:11.275029+08:00 (in 3604.131156 seconds)
+[2023-08-18 01:00:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-19 01:00:03 CST)" (scheduled at 2023-08-18 01:00:07.008517+08:00)
+[2023-08-18 01:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-19 01:00:03 CST)" executed successfully
+[2023-08-18 02:00:11] [DEBUG] >>>  Looking for jobs to run
+[2023-08-18 02:00:11] [DEBUG] >>>  Next wakeup is due at 2023-08-18 03:30:18.355202+08:00 (in 5407.067319 seconds)
+[2023-08-18 02:00:11] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-19 02:00:14 CST)" (scheduled at 2023-08-18 02:00:11.275029+08:00)
+[2023-08-18 02:00:11] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-19 02:00:14 CST)" executed successfully
+[2023-08-18 03:30:18] [DEBUG] >>>  Looking for jobs to run
+[2023-08-18 03:30:18] [DEBUG] >>>  Next wakeup is due at 2023-08-18 04:00:00.543887+08:00 (in 1782.181918 seconds)
+[2023-08-18 03:30:18] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-19 03:30:21 CST)" (scheduled at 2023-08-18 03:30:18.355202+08:00)
+[2023-08-18 03:30:18] [ERROR] >>>  Main program error:
+[2023-08-18 03:30:18] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-18 03:30:18] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-18 03:30:18] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-19 03:30:21 CST)" executed successfully
+[2023-08-18 04:00:00] [DEBUG] >>>  Looking for jobs to run
+[2023-08-18 04:00:00] [DEBUG] >>>  Next wakeup is due at 2023-08-19 01:00:03.043151+08:00 (in 75602.495940 seconds)
+[2023-08-18 04:00:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-19 04:00:06 CST)" (scheduled at 2023-08-18 04:00:00.543887+08:00)
+[2023-08-18 04:00:02] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-19 04:00:06 CST)" executed successfully
+[2023-08-19 01:00:03] [DEBUG] >>>  Looking for jobs to run
+[2023-08-19 01:00:03] [DEBUG] >>>  Next wakeup is due at 2023-08-19 02:00:14.864471+08:00 (in 3611.695225 seconds)
+[2023-08-19 01:00:03] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-20 01:00:01 CST)" (scheduled at 2023-08-19 01:00:03.043151+08:00)
+[2023-08-19 01:00:03] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-20 01:00:01 CST)" executed successfully
+[2023-08-19 02:00:14] [DEBUG] >>>  Looking for jobs to run
+[2023-08-19 02:00:14] [DEBUG] >>>  Next wakeup is due at 2023-08-19 03:30:21.367586+08:00 (in 5406.492293 seconds)
+[2023-08-19 02:00:14] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-20 02:00:03 CST)" (scheduled at 2023-08-19 02:00:14.864471+08:00)
+[2023-08-19 02:00:14] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-20 02:00:03 CST)" executed successfully
+[2023-08-19 03:30:21] [DEBUG] >>>  Looking for jobs to run
+[2023-08-19 03:30:21] [DEBUG] >>>  Next wakeup is due at 2023-08-19 04:00:06.213288+08:00 (in 1784.837387 seconds)
+[2023-08-19 03:30:21] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-20 03:30:44 CST)" (scheduled at 2023-08-19 03:30:21.367586+08:00)
+[2023-08-19 03:30:21] [ERROR] >>>  Main program error:
+[2023-08-19 03:30:21] [ERROR] >>>  (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-08-19 03:30:21] [ERROR] >>>  Traceback (most recent call last):
+  File "src\pymssql\_pymssql.pyx", line 458, in pymssql._pymssql.Cursor.execute
+  File "src\pymssql\_mssql.pyx", line 1086, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1117, in pymssql._mssql.MSSQLConnection.execute_query
+  File "src\pymssql\_mssql.pyx", line 1250, in pymssql._mssql.MSSQLConnection.format_and_run_query
+  File "src\pymssql\_mssql.pyx", line 1788, in pymssql._mssql.check_cancel_and_raise
+  File "src\pymssql\_mssql.pyx", line 1834, in pymssql._mssql.raise_MSSQLDatabaseException
+pymssql._mssql.MSSQLDatabaseException: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+pymssql._pymssql.OperationalError: (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\out_data\parket\regular_task.py", line 30, in execute_sql
+    oa_con.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "src\pymssql\_pymssql.pyx", line 478, in pymssql._pymssql.Cursor.execute
+sqlalchemy.exc.OperationalError: (pymssql._pymssql.OperationalError) (20047, b'DB-Lib error message 20047, severity 9:\nDBPROCESS is dead or not enabled\n')
+[SQL: insert into ads_gp_oa_t_area_unit_sales_dd
+select *
+from (select t1.date_y,
+             t1.date_q,
+             t1.date_m,
+             t1.confirm_date,
+             t1.area,
+             t1.area_unit,
+             IIF(t1.income - t2.current_income = null, 0, t1.income - t2.current_income)         as income,
+             IIF(t1.unincome - t2.current_unincome = null, 0, t1.unincome - t2.current_unincome) as unincome,
+             t1.update_date
+      from (select year_date                  date_y,
+                   季度                       date_q,
+                   date_m,
+                   确认收入日期               confirm_date,
+                   更新日期                   update_date,
+                   case
+                       when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                       when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                           then '其它（非营销中心）'
+                       when 大区 is null then '其他'
+                       else 大区 end          area,
+                   考核单位                   area_unit,
+                   round(sum(确认收入), 0) as income,
+                   round(sum(待确认收入), 0)  unincome
+            from (SELECT field0004                                                                           料号,
+                         大区名称                                                                            大区,
+                         case
+                             when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                             when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                             when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                             else field0012 end                                                              考核单位,
+                         field0067                                                                           产品名称,
+                         field0108                                                                           合同年份,
+                         field0049                                                                           实施情况,
+                         substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4)        year_date,
+                         concat('Q', datepart(quarter, field0297))                                           季度,
+                         concat(datepart(month, field0297), '月')                                            date_m,
+                         convert(varchar(100), field0297, 23)                                                确认收入日期,
+                         convert(varchar(100), field0009, 23)                                                更新日期,
+                         field0291                                                                           待确认收入类型,
+                         field0002                                                                           合同,
+                         sum(field0278)                                                                      确认收入,
+                         SUM(field0290)                      待确认收入,
+                         sum(case when field0066 = '产品' then field0103 else 0 end)                         出货量,
+                         sum(field0046)                                                                      产品实际毛利,
+                         sum(case when (field0029 <> '否' or field0078 <> '其他') then field0016 else 0 end) 合同产品金额
+                  FROM formmain_105321 AS t1
+                           left join
+                       (select t1.大区名称, t1."三级部门ID", "NAME"
+                        from saleDepartLevel as t1
+                                 join org_unit as t2 on t1."三级部门ID" = t2."ID"
+                        where t1.大区名称 in ('北分管理部', '北区管理部', '南区管理部', '战略合作部', '长沙办', '上海大区')
+                        group by t1.大区名称, t1."三级部门ID", "NAME") as t2
+                       on case
+                              when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                              when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                              when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                              else field0012 end = t2."NAME"
+                           join (select field0002 as contract_code
+                                 from formmain_1119
+                                 where coalesce(field1039, '其他') <> '已注销') as t3 on t1.field0002 = t3.contract_code
+                  where coalesce(t1.field0027, '其他') <> '内部结算'
+                  GROUP BY field0004, 大区名称,
+                           case
+                               when field0012 = '北京渠道事业部' then '渠道事业部(北京分公司)'
+                               when field0012 = '军民融合事业部二部' then '军民融合事业二部'
+                               when field0012 = '上海浦东新监管事业部' then '上海新监管浦东事业部'
+                               else field0012 end, field0067,
+                           field0108,
+                           field0049,
+                           substring(cast(convert(varchar(100), field0297, 120) as varchar(100)), 1, 4),
+                           concat('Q', datepart(quarter, field0297)),
+                           concat(datepart(month, field0297), '月'),
+                           convert(varchar(100), field0297, 23), convert(varchar(100), field0009, 23),
+                           field0291, field0002) as t1
+                 --where 大区 is not null
+            group by year_date,
+                     季度,
+                     date_m,
+                     确认收入日期,
+                     更新日期,
+                     case
+                         when 考核单位 = '全国运营商行业部' then '其它（营销中心）'
+                         when 考核单位 in ('北京网安', '金华总经办', '数瀚项目实施部', '综合业务部')
+                             then '其它（非营销中心）'
+                          when 大区 is null then '其他'
+                         else 大区 end,
+                     考核单位) as t1
+               left join (select cast(area as varchar(800))                as area,
+                                 cast(area_unit as varchar(800))           as area_unit,
+                                 cast(date_y as varchar(800))              as date_y,
+                                 max_date                                  as confirm_date,
+                                 max_update_date                           as update_date,
+                                 round(sum(coalesce(income_diff, 0)), 0)   as current_income,
+                                 round(sum(coalesce(unincome_diff, 0)), 0) as current_unincome
+                          from ads_gp_oa_t_area_unit_sales_dd as t
+                                   left join (select max(confirm_date) max_date, max(update_date) max_update_date
+                                              from ads_gp_oa_t_area_unit_sales_dd) as t2 on 1 = 1
+                          group by cast(area as varchar(800))
+                                 , cast(area_unit as varchar(800))
+                                 , cast(date_y as varchar(800))
+                                 , max_date, max_update_date) as t2
+                         on t1.date_y = t2.date_y and t1.area = t1.area and t1.area_unit = t2.area_unit and
+                            t1.update_date <> t2.update_date) as m
+where income <> 0
+   or unincome <> 0;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+
+[2023-08-19 03:30:21] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-20 03:30:44 CST)" executed successfully
+[2023-08-19 04:00:06] [DEBUG] >>>  Looking for jobs to run
+[2023-08-19 04:00:06] [DEBUG] >>>  Next wakeup is due at 2023-08-20 01:00:01.806824+08:00 (in 75595.588591 seconds)
+[2023-08-19 04:00:06] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-20 04:00:08 CST)" (scheduled at 2023-08-19 04:00:06.213288+08:00)
+[2023-08-19 04:00:08] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-20 04:00:08 CST)" executed successfully
+[2023-08-20 01:00:01] [DEBUG] >>>  Looking for jobs to run
+[2023-08-20 01:00:01] [DEBUG] >>>  Next wakeup is due at 2023-08-20 02:00:03.754209+08:00 (in 3601.823518 seconds)
+[2023-08-20 01:00:01] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-21 01:00:02 CST)" (scheduled at 2023-08-20 01:00:01.806824+08:00)
+[2023-08-20 01:00:01] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-21 01:00:02 CST)" executed successfully
+[2023-08-20 02:00:03] [DEBUG] >>>  Looking for jobs to run
+[2023-08-20 02:00:03] [DEBUG] >>>  Next wakeup is due at 2023-08-20 03:30:44.356416+08:00 (in 5440.591504 seconds)
+[2023-08-20 02:00:03] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-21 02:00:13 CST)" (scheduled at 2023-08-20 02:00:03.754209+08:00)
+[2023-08-20 02:00:03] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-21 02:00:13 CST)" executed successfully
+[2023-08-20 03:30:44] [DEBUG] >>>  Looking for jobs to run
+[2023-08-20 03:30:44] [DEBUG] >>>  Next wakeup is due at 2023-08-20 04:00:08.208308+08:00 (in 1763.841722 seconds)
+[2023-08-20 03:30:44] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-21 03:30:31 CST)" (scheduled at 2023-08-20 03:30:44.356416+08:00)
+[2023-08-20 03:30:46] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-21 03:30:31 CST)" executed successfully
+[2023-08-20 04:00:08] [DEBUG] >>>  Looking for jobs to run
+[2023-08-20 04:00:08] [DEBUG] >>>  Next wakeup is due at 2023-08-21 01:00:02.905488+08:00 (in 75594.693620 seconds)
+[2023-08-20 04:00:08] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-21 04:00:14 CST)" (scheduled at 2023-08-20 04:00:08.208308+08:00)
+[2023-08-20 04:00:11] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-21 04:00:14 CST)" executed successfully
+[2023-08-21 01:00:03] [DEBUG] >>>  Looking for jobs to run
+[2023-08-21 01:00:03] [DEBUG] >>>  Next wakeup is due at 2023-08-21 02:00:13.740440+08:00 (in 3610.700783 seconds)
+[2023-08-21 01:00:03] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-22 01:00:03 CST)" (scheduled at 2023-08-21 01:00:02.905488+08:00)
+[2023-08-21 01:00:03] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-22 01:00:03 CST)" executed successfully
+[2023-08-21 02:00:13] [DEBUG] >>>  Looking for jobs to run
+[2023-08-21 02:00:13] [DEBUG] >>>  Next wakeup is due at 2023-08-21 03:30:31.230562+08:00 (in 5417.479840 seconds)
+[2023-08-21 02:00:13] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-22 02:00:05 CST)" (scheduled at 2023-08-21 02:00:13.740440+08:00)
+[2023-08-21 02:00:13] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-22 02:00:05 CST)" executed successfully
+[2023-08-21 03:30:31] [DEBUG] >>>  Looking for jobs to run
+[2023-08-21 03:30:31] [DEBUG] >>>  Next wakeup is due at 2023-08-21 04:00:14.208742+08:00 (in 1782.967196 seconds)
+[2023-08-21 03:30:31] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-22 03:30:30 CST)" (scheduled at 2023-08-21 03:30:31.230562+08:00)
+[2023-08-21 03:30:33] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-22 03:30:30 CST)" executed successfully
+[2023-08-21 04:00:14] [DEBUG] >>>  Looking for jobs to run
+[2023-08-21 04:00:14] [DEBUG] >>>  Next wakeup is due at 2023-08-22 01:00:03.374423+08:00 (in 75589.160028 seconds)
+[2023-08-21 04:00:14] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-22 04:00:01 CST)" (scheduled at 2023-08-21 04:00:14.208742+08:00)
+[2023-08-21 04:00:18] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-22 04:00:01 CST)" executed successfully
+[2023-08-22 01:00:03] [DEBUG] >>>  Looking for jobs to run
+[2023-08-22 01:00:03] [DEBUG] >>>  Next wakeup is due at 2023-08-22 02:00:05.923585+08:00 (in 3602.414341 seconds)
+[2023-08-22 01:00:03] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-23 01:00:06 CST)" (scheduled at 2023-08-22 01:00:03.374423+08:00)
+[2023-08-22 01:00:05] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-23 01:00:06 CST)" executed successfully
+[2023-08-22 02:00:05] [DEBUG] >>>  Looking for jobs to run
+[2023-08-22 02:00:05] [DEBUG] >>>  Next wakeup is due at 2023-08-22 03:30:30.406903+08:00 (in 5424.470895 seconds)
+[2023-08-22 02:00:05] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-23 02:00:07 CST)" (scheduled at 2023-08-22 02:00:05.923585+08:00)
+[2023-08-22 02:00:05] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-23 02:00:07 CST)" executed successfully
+[2023-08-22 03:30:30] [DEBUG] >>>  Looking for jobs to run
+[2023-08-22 03:30:30] [DEBUG] >>>  Next wakeup is due at 2023-08-22 04:00:01.646622+08:00 (in 1771.229298 seconds)
+[2023-08-22 03:30:30] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-23 03:30:44 CST)" (scheduled at 2023-08-22 03:30:30.406903+08:00)
+[2023-08-22 03:30:33] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-23 03:30:44 CST)" executed successfully
+[2023-08-22 04:00:01] [DEBUG] >>>  Looking for jobs to run
+[2023-08-22 04:00:01] [DEBUG] >>>  Next wakeup is due at 2023-08-23 01:00:06.457620+08:00 (in 75604.804297 seconds)
+[2023-08-22 04:00:01] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-23 04:00:00 CST)" (scheduled at 2023-08-22 04:00:01.646622+08:00)
+[2023-08-22 04:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-23 04:00:00 CST)" executed successfully
+[2023-08-23 01:00:06] [DEBUG] >>>  Looking for jobs to run
+[2023-08-23 01:00:06] [DEBUG] >>>  Next wakeup is due at 2023-08-23 02:00:07.706145+08:00 (in 3601.121083 seconds)
+[2023-08-23 01:00:06] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-24 01:00:06 CST)" (scheduled at 2023-08-23 01:00:06.457620+08:00)
+[2023-08-23 01:00:06] [INFO] >>>  Job "execute_sql (trigger: cron[hour='1', minute='0', second='0'], next run at: 2023-08-24 01:00:06 CST)" executed successfully
+[2023-08-23 02:00:07] [DEBUG] >>>  Looking for jobs to run
+[2023-08-23 02:00:07] [DEBUG] >>>  Next wakeup is due at 2023-08-23 03:30:44.757092+08:00 (in 5437.037498 seconds)
+[2023-08-23 02:00:07] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-24 02:00:05 CST)" (scheduled at 2023-08-23 02:00:07.706145+08:00)
+[2023-08-23 02:00:07] [INFO] >>>  Job "execute_sql (trigger: cron[hour='2', minute='0', second='0'], next run at: 2023-08-24 02:00:05 CST)" executed successfully
+[2023-08-23 03:30:44] [DEBUG] >>>  Looking for jobs to run
+[2023-08-23 03:30:44] [DEBUG] >>>  Next wakeup is due at 2023-08-23 04:00:00.016790+08:00 (in 1755.251506 seconds)
+[2023-08-23 03:30:44] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-24 03:30:27 CST)" (scheduled at 2023-08-23 03:30:44.757092+08:00)
+[2023-08-23 03:30:46] [INFO] >>>  Job "execute_sql (trigger: cron[hour='3', minute='30', second='0'], next run at: 2023-08-24 03:30:27 CST)" executed successfully
+[2023-08-23 04:00:00] [DEBUG] >>>  Looking for jobs to run
+[2023-08-23 04:00:00] [DEBUG] >>>  Next wakeup is due at 2023-08-24 01:00:06.142220+08:00 (in 75606.118656 seconds)
+[2023-08-23 04:00:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-24 04:00:13 CST)" (scheduled at 2023-08-23 04:00:00.016790+08:00)
+[2023-08-23 04:00:09] [INFO] >>>  Job "execute_sql (trigger: cron[hour='4', minute='0', second='0'], next run at: 2023-08-24 04:00:13 CST)" executed successfully

@@ -1,0 +1,94 @@
+[2023-08-28 10:39:08] [ERROR] >>>  Main program error:
+[2023-08-28 10:39:08] [ERROR] >>>  (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OFFSET 0 ROWS FETCH FIRST 500 ROWS ONLY' at line 4")
+[SQL: 
+                    SELECT * 
+                    FROM test_105321
+                    order by id
+                    OFFSET 0 ROWS FETCH FIRST 500 ROWS ONLY
+                    ]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+[2023-08-28 10:39:08] [ERROR] >>>  Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\cursors.py", line 148, in execute
+    result = self._query(query)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\cursors.py", line 310, in _query
+    conn.query(q)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 548, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 775, in _read_query_result
+    result.read()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 1156, in read
+    first_packet = self.connection._read_packet()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 725, in _read_packet
+    packet.raise_for_error()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\protocol.py", line 221, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\err.py", line 143, in raise_mysql_exception
+    raise errorclass(errno, errval)
+pymysql.err.ProgrammingError: (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OFFSET 0 ROWS FETCH FIRST 500 ROWS ONLY' at line 4")
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 368, in execute_sql
+    data = pd.read_sql(query, source_con)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pandas\io\sql.py", line 593, in read_sql
+    return pandas_sql.read_query(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pandas\io\sql.py", line 1560, in read_query
+    result = self.execute(*args)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pandas\io\sql.py", line 1405, in execute
+    return self.connectable.execution_options().execute(*args, **kwargs)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\cursors.py", line 148, in execute
+    result = self._query(query)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\cursors.py", line 310, in _query
+    conn.query(q)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 548, in query
+    self._affected_rows = self._read_query_result(unbuffered=unbuffered)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 775, in _read_query_result
+    result.read()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 1156, in read
+    first_packet = self.connection._read_packet()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\connections.py", line 725, in _read_packet
+    packet.raise_for_error()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\protocol.py", line 221, in raise_for_error
+    err.raise_mysql_exception(self._data)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\pymysql\err.py", line 143, in raise_mysql_exception
+    raise errorclass(errno, errval)
+sqlalchemy.exc.ProgrammingError: (pymysql.err.ProgrammingError) (1064, "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OFFSET 0 ROWS FETCH FIRST 500 ROWS ONLY' at line 4")
+[SQL: 
+                    SELECT * 
+                    FROM test_105321
+                    order by id
+                    OFFSET 0 ROWS FETCH FIRST 500 ROWS ONLY
+                    ]
+(Background on this error at: https://sqlalche.me/e/14/f405)
+
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "POST /offline_task/html/data_sync HTTP/1.1" 200 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/js/search_more.js HTTP/1.1[0m" 304 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/js/option_get_json.js HTTP/1.1[0m" 304 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/js/edit_nodes.js HTTP/1.1[0m" 304 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-08-28 10:39:08] [INFO] >>>  10.60.4.29 - - [28/Aug/2023 10:39:08] "[36mGET /static/config.json HTTP/1.1[0m" 304 -

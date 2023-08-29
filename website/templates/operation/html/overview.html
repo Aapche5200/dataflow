@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dataflow</title>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+</head>
+<body>
+{% extends "layout.html" %}
+
+{% block title %}更新任务{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <form action="/operation/html/overview" method="post">
+        <label class="success-title">业务日期:{{event_date}}</label>
+        <input type="date" name="selected_date" value="{{ current_date }}"
+               onchange="this.form.submit()">
+    </form>
+    <div class="stats-container">
+        <h2>任务情况概览</h2>
+        <div class="stat-wrapper">
+            <div class="stat">
+                <p>总任务数</p>
+                <p>{{ total_tasks }}</p>
+            </div>
+            <div class="stat">
+                <p>成功任务数</p>
+                <p>{{ success_tasks }}</p>
+            </div>
+            <div class="stat">
+                <p>未执行任务数</p>
+                <p>{{ pending_tasks }}</p>
+            </div>
+            <div class="stat">
+                <p>失败任务数</p>
+                <p>{{ failed_tasks }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="stats-container">
+        <h2>个人任务趋势</h2>
+        <div class="stat-wrapper">
+            <div class="stat">
+                 {{ plot_one|safe }}
+            </div>
+            <div class="stat">
+                 {{ plot_two|safe }}
+            </div>
+            <div class="stat">
+                 {{ plot_three|safe }}
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+</div>
+</body>
+</html>
+
