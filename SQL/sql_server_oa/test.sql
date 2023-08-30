@@ -1,0 +1,23 @@
+SELECT *
+FROM XBBUserSaleStandardnameView
+order by 工号
+OFFSET 0 ROWS FETCH FIRST 1000 ROWS ONLY
+
+
+SELECT  *
+FROM XBBUserSaleStandardnameView
+order by 工号
+OFFSET 1 ROWS
+
+
+select top 10 * from ABV5.CTP_CONTENT_ALL
+
+
+SELECT
+	*
+FROM
+	formmain_105321
+ORDER BY id
+-- limit 100
+OFFSET 0
+ROWS FETCH FIRST 500 ROWS ONLY

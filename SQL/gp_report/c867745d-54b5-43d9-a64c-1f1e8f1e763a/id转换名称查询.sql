@@ -1,0 +1,1 @@
+select showvalue from  ds_oa_ctp_enum_item where id =''
