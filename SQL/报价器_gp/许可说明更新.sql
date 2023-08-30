@@ -1,0 +1,41 @@
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-160';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-290';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-290-D';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-490';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-490-D';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-690';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-890';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-1900';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-2900';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-3900';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-4900';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-8900';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-12900';
+update t_model set license_desc='可扩展10台设备管理license授权、50设备管理license授权、100台设备管理license授权、500台设备管理license授权。' where name='DAS-Gateway-NMS';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-290-BM';
+update t_model set license_desc='可扩展入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-2900-BM';
+update t_model set license_desc='默认含3年防病毒、防攻击、上网行为管理、威胁情报特征库升级服务。' where name='DAS-NGFW-A800-LU';
+update t_model set license_desc='默认含3年防病毒、防攻击、上网行为管理、威胁情报特征库升级服务。' where name='DAS-NGFW-A800-FU';
+update t_model set license_desc='默认含3年防病毒、防攻击、上网行为管理、威胁情报特征库升级服务。' where name='DAS-NGFW-A800S-ZK V3.0';
+update t_model set license_desc='默认含3年防病毒、防攻击、上网行为管理、威胁情报特征库升级服务。' where name='DAS-NGFW-A800S-HK V3.0';
+update t_model set license_desc='默认含3年防病毒、防攻击、上网行为管理、威胁情报特征库升级服务。' where name='DAS-NGFW-A1000S-HK V3.0';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-720';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-920';
+update t_model set license_desc='默认标配3年的入侵检测与防御许可（IPS）、病毒防护许可（AV）、上网行为管理许可（APP&URL）。注意：上述默认许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-Gateway-1920';
+update t_model set license_desc='默认含3年入侵防御、防病毒、威胁情报特征库升级服务' where name='DAS-IPS-A800-LU';
+update t_model set license_desc='默认含3年入侵防御、防病毒、威胁情报特征库升级服务' where name='DAS-IPS-A800-FU';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-110';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-310';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-530';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-660';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-830';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-950';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-1200';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-2150';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-3200';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-5500';
+update t_model set license_desc='默认标配3年的上网行为管理许可（APP&URL）、入侵检测与防御许可（IPS）、病毒防护许可（AV）、威胁情报许可（IT）、Web防护许可（WAF）。 注意：上述许可需在维保期内申请，过维保期后申请无法开通。' where name='DAS-AC-10000';
+
+
+
+    select name,license_desc,* from t_model where name='DAS-Gateway-290';

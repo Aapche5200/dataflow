@@ -1,0 +1,20 @@
+select
+trc.id id,
+tme.code 产品型号编码,
+tme.name 产品型号,
+tmu.name  产品模块,
+tmu.material_code 物料编码,
+choice_value 模块选择,
+max_count 模块最大数量,
+min_count 模块最小数量,
+default_count 默认数量,
+rule_value 模块配置规则,
+total_count 模块数量合计不超过,
+trc.config_guide 配置指导
+from t_rule_config trc
+left join t_model  tme on trc.model_id=tme.id
+left join t_module tmu on trc.module_id=tmu.id
+where tmu.name not in('默认含质保期限（1年）','默认含质保期限（38个月）','默认含质保期限（3年）','默认含质保期限（42个月）')
+
+select * from ods_gp_data_assets
+
