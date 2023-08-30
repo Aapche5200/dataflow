@@ -10,7 +10,7 @@ FROM
   "public"."ods_es_xdr_log_detail_dd"
 WHERE
   (date("collectorReceiptTime") = '2023-04-13'
-) fafafa
+)
 select date(date(current_date) - interval '139 days')
 select date(date('2023-08-18') - interval '127 days')
 select date(date('2023-05-09') - interval '26 days')
