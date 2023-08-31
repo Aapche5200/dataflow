@@ -5,9 +5,11 @@ import datetime
 import time
 import plotly.graph_objects as go
 from templates.offline_task.schedule_info import default_engine
+from templates.data_work.get_task_info import get_users
 
 
 def home():
+    username = get_users()
     # 生成新的版本号或时间戳
     version = int(time.time())
     # 获取日期搜索框的值
@@ -20,26 +22,35 @@ def home():
     # 查询任务总数
     total_tasks = \
         default_engine.execute(
-            'SELECT COUNT(*) FROM ods_task_job_schedule_pool').fetchone()[0]
+            f'''
+            SELECT COUNT(*) 
+            FROM ods_task_job_schedule_pool
+            where if('{username}' like 'admin%%',1=1,job_owner='{username}')
+            '''
+        ).fetchone()[0]
 
     # 查询每天成功、未执行和失败的任务总数
     success_tasks = default_engine.execute(
         f"SELECT COUNT(distinct job_name) "
         f"FROM ods_task_job_execute_log "
         f"WHERE DATE(end_time) = date('{selected_date}') "
+        f"and if('{username}' like 'admin%%',1=1,job_owner='{username}') "
         f"AND job_result = 'T'").fetchone()[0]
     pending_tasks = default_engine.execute(
         f'''
         SELECT  COUNT(distinct  t1.job_name)-count(distinct t2.job_name)
         FROM ods_task_job_schedule_pool as t1
         left join (select job_name from ods_task_job_execute_log
-        where DATE(end_time)=date('{selected_date}') ) as t2 on t1.job_name=t2.job_name
+        where DATE(end_time)=date('{selected_date}') 
+        ) as t2 on t1.job_name=t2.job_name 
+        where if('{username}' like 'admin%%',1=1,job_owner='{username}')
         ''').fetchone()[0]
     failed_tasks = default_engine.execute(
         f"SELECT COUNT(distinct job_name) "
         f"FROM ods_task_job_execute_log "
         f"WHERE DATE(end_time) = date('{selected_date}') "
-        f"AND job_result = 'F'").fetchone()[0]
+        f"AND  if('{username}' like 'admin%%',1=1,job_owner='{username}') "
+        f"AND job_result != 'T'").fetchone()[0]
 
     plot_one = home_charts_one(selected_date)
     plot_two = home_charts_two(selected_date)
@@ -59,7 +70,7 @@ def home():
 
 
 def home_charts_one(selected_date):
-    # 个人趋势图部分
+    username = get_users()
 
     # 获取pool表中不同job_owner的任务总数
     query1 = f'''
@@ -68,7 +79,8 @@ def home_charts_one(selected_date):
     COUNT(distinct t1.job_name) AS total_tasks
     FROM ods_task_job_execute_log t1
     left join ods_task_job_schedule_pool as t2 on t1.job_name = t2.job_name
-    WHERE DATE(t1.end_time) = date('{selected_date}')
+    WHERE DATE(t1.end_time) = date('{selected_date}') 
+    and  if('{username}' like 'admin%%',1=1,t2.job_owner='{username}')
     GROUP BY coalesce(t2.job_owner, '停止执行')
         '''
     result1 = default_engine.execute(query1).fetchall()
@@ -107,6 +119,7 @@ def home_charts_one(selected_date):
 
 
 def home_charts_two(selected_date):
+    username = get_users()
     # 获取log表中不同job_owner和job_result的任务总数
     query2 = f'''
     SELECT coalesce(t2.job_owner,'停止执行') as job_owner, 
@@ -114,7 +127,8 @@ def home_charts_two(selected_date):
     COUNT(distinct t1.job_name) AS total_tasks
     FROM ods_task_job_execute_log t1
     left join ods_task_job_schedule_pool as t2 on t1.job_name=t2.job_name
-    WHERE DATE(t1.end_time) = date('{selected_date}')
+    WHERE DATE(t1.end_time) = date('{selected_date}') 
+    and  if('{username}' like 'admin%%',1=1,t2.job_owner='{username}')
     GROUP BY coalesce(t2.job_owner,'停止执行'), job_result
         '''
     result2 = default_engine.execute(query2)
@@ -164,12 +178,14 @@ def home_charts_two(selected_date):
 
 
 def home_charts_three(selected_date):
+    username = get_users()
     # 获取log表中每天的任务总数
-    query3 = "SELECT DATE(end_time) as event_date, " \
-             "COUNT(distinct job_name) AS total_tasks " \
-             "FROM ods_task_job_execute_log " \
-             "GROUP BY DATE(end_time)" \
-             "order by date(end_time)"
+    query3 = f"SELECT DATE(end_time) as event_date, " \
+             f"COUNT(distinct job_name) AS total_tasks " \
+             f"FROM ods_task_job_execute_log " \
+             f"where  if('{username}' like 'admin%%',1=1,job_owner='{username}') " \
+             f"GROUP BY DATE(end_time)" \
+             f"order by date(end_time)"
     result3 = default_engine.execute(query3).fetchall()
 
     # 将结果转换为Pandas DataFrame
@@ -214,5 +230,3 @@ def home_charts_three(selected_date):
     plot_total_day = fig.to_html(full_html=False)
     return plot_total_day
 
-
-# 仅仅只是为了测试。谢谢faff

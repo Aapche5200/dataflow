@@ -1,95 +1,23 @@
-[2023-08-30 02:40:13] [ERROR] >>>  Main program error:
-[2023-08-30 02:40:13] [ERROR] >>>  [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 02:40:13] [ERROR] >>>  Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 395, in execute_sql
-    print(offset)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
+[2023-08-31 09:31:43] [ERROR] >>>  Main program error:
+[2023-08-31 09:31:43] [ERROR] >>>  cannot schedule new futures after interpreter shutdown
+[2023-08-31 09:31:43] [ERROR] >>>  Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 392, in execute_sql
+    executor.map(process_data_and_insert, [data])
+  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\_base.py", line 598, in map
+    fs = [self.submit(fn, *args) for args in zip(*iterables)]
+  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\_base.py", line 598, in <listcomp>
+    fs = [self.submit(fn, *args) for args in zip(*iterables)]
+  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\thread.py", line 169, in submit
+    raise RuntimeError('cannot schedule new futures after '
+RuntimeError: cannot schedule new futures after interpreter shutdown
 
-[2023-08-30 02:40:13] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='2', minute='40', second='0'], next run at: 2023-08-31 02:40:01 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 395, in execute_sql
-    print(offset)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 410, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 03:41:25] [DEBUG] >>>  Looking for jobs to run
-[2023-08-30 03:41:25] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='3', minute='41', second='0'], next run at: 2023-08-31 03:41:03 CST)" (scheduled at 2023-08-30 03:41:25.936508+08:00)
-[2023-08-30 03:41:25] [DEBUG] >>>  Next wakeup is due at 2023-08-30 04:17:48.262338+08:00 (in 2182.287791 seconds)
-[2023-08-30 03:41:32] [ERROR] >>>  Main program error:
-[2023-08-30 03:41:32] [ERROR] >>>  [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 03:41:32] [ERROR] >>>  Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 395, in execute_sql
-    print(offset)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-
-[2023-08-30 03:41:32] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='3', minute='41', second='0'], next run at: 2023-08-31 03:41:03 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 395, in execute_sql
-    print(offset)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 410, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 04:17:48] [DEBUG] >>>  Looking for jobs to run
-[2023-08-30 04:17:48] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='17', second='0'], next run at: 2023-08-31 04:17:26 CST)" (scheduled at 2023-08-30 04:17:48.262338+08:00)
-[2023-08-30 04:17:48] [DEBUG] >>>  Next wakeup is due at 2023-08-30 05:03:10.452710+08:00 (in 2722.175171 seconds)
-[2023-08-30 04:17:54] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='4', minute='17', second='0'], next run at: 2023-08-31 04:17:26 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 05:03:10] [DEBUG] >>>  Looking for jobs to run
-[2023-08-30 05:03:10] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-08-31 05:03:11 CST)" (scheduled at 2023-08-30 05:03:10.452710+08:00)
-[2023-08-30 05:03:10] [DEBUG] >>>  Next wakeup is due at 2023-08-30 05:18:39.660210+08:00 (in 929.187258 seconds)
-[2023-08-30 05:03:10] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-08-31 05:03:11 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 05:18:39] [DEBUG] >>>  Looking for jobs to run
-[2023-08-30 05:18:39] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='18', second='0'], next run at: 2023-08-31 05:18:03 CST)" (scheduled at 2023-08-30 05:18:39.660210+08:00)
-[2023-08-30 05:18:39] [DEBUG] >>>  Next wakeup is due at 2023-08-30 05:34:26.306165+08:00 (in 946.630684 seconds)
-[2023-08-30 05:18:43] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='18', second='0'], next run at: 2023-08-31 05:18:03 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 05:34:26] [DEBUG] >>>  Looking for jobs to run
-[2023-08-30 05:34:26] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-08-31 05:34:24 CST)" (scheduled at 2023-08-30 05:34:26.306165+08:00)
-[2023-08-30 05:34:26] [DEBUG] >>>  Next wakeup is due at 2023-08-30 09:30:00+08:00 (in 14133.679919 seconds)
-[2023-08-30 05:34:26] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-08-31 05:34:24 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    print(job_result)
-OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
-[2023-08-30 08:57:13] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:57:13] "GET /operation/html/operation HTTP/1.1" 200 -
-[2023-08-30 08:57:13] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:57:13] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
-[2023-08-30 08:57:13] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:57:13] "[36mGET /static/js/search_more.js HTTP/1.1[0m" 304 -
-[2023-08-30 08:57:13] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:57:13] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
-[2023-08-30 08:58:36] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:58:36] "GET /operation/html/overview HTTP/1.1" 200 -
-[2023-08-30 08:58:36] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:58:36] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
-[2023-08-30 08:58:36] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:58:36] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
-[2023-08-30 08:59:49] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:59:49] "GET /operation/html/overview HTTP/1.1" 200 -
-[2023-08-30 08:59:49] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:59:49] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
-[2023-08-30 08:59:49] [INFO] >>>  10.60.4.29 - - [30/Aug/2023 08:59:49] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
+[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.982853 seconds)
+[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
+[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.976867 seconds)
+[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
+[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.971856 seconds)
+[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
+[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.966852 seconds)
+[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
+[2023-08-31 09:31:43] [INFO] >>>  Job "execute_sql (trigger: cron[hour='9', minute='30', second='0'], next run at: 2023-09-01 09:30:00 CST)" executed successfully

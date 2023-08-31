@@ -13,6 +13,7 @@ import pandas as pd
 from templates.pro_management.add_users import get_registered_users
 from templates.offline_task.schedule_info import task_scheduler, default_engine
 from config_dependency import task_node_list, edit_node, show_edit_nodes
+from templates.data_work.get_task_info import get_users
 
 
 def sync_tasks():
@@ -102,12 +103,14 @@ def sync_tasks():
 
 
 def get_tasks_all():
+    username = get_users()
     execute_result_query = f'''
             select job_name,job_db,job_sql,job_status,
             job_owner,job_desc,
             job_frequency,job_time 
             from ods_task_job_schedule_pool
-            where job_type='数据同步'
+            where job_type='数据同步' and 
+            if('{username}' like 'admin%%',1=1,job_owner='{username}')
         '''
     tasks_all = default_engine.execute(execute_result_query).fetchall()
 

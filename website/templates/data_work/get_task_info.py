@@ -1,7 +1,14 @@
 import datetime
+from flask import session
+
+
+def get_users():
+    username = session['username']
+    return username
 
 
 def get_task_result(default_engine, now_date):
+    username = get_users()
     if not now_date:
         now_date = datetime.date.today().strftime("%Y-%m-%d")
     get_task_result_query = f'''
@@ -29,9 +36,10 @@ def get_task_result(default_engine, now_date):
 		ods_task_job_execute_log AS tt1
 		LEFT JOIN apscheduler_jobs AS tt2 ON tt1.job_name = tt2.id 
 	WHERE
-	date( end_time ) = date( '{now_date}' )
+	date( end_time ) = date( '{now_date}' ) 
 	)as tt 	where rank_time=1 
 	) AS t2 ON t1.job_name = t2.job_name
+	where if('{username}' like 'admin%%',1=1,job_owner='{username}')
         '''
     get_task_results = default_engine.execute(get_task_result_query).fetchall()
 
