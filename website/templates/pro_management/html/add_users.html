@@ -45,6 +45,8 @@
                 <tr>
                     <th>设置状态</th>
                     <th>用户名</th>
+                    <th>菜单权限</th>
+                    <th>配置操作</th>
                 </tr>
                 {% for user in user_list %}
                 <tr>
@@ -57,12 +59,80 @@
                         {% endif %}
                     </td>
                     <td>{{ user }}</td>
+                    <form method="post">
+                            <td style="vertical-align: top;">
+                                <div class="searchable">
+                                    <input type="hidden" name="user_name"
+                                           id="user_name"
+                                           value="{{user}}">
+                                    <input class="selectedOptions search-input"
+                                           id="dependencies"
+                                           name="dependencies"
+                                           readonly>
+                                    <br>
+                                    {% for result_node in result_permissions %}
+                                    {% if result_node[1] == user %}
+                                    {{ result_node[0]|safe }}
+                                    {% endif %}
+                                    {% endfor %}
+                                    <div class="optionsContainer">
+                                        <input type="text"
+                                               class="search-input searchInput"
+                                               placeholder="搜索选项">
+                                        {% for option in menu_lists %}
+                                        {% if option != user %}
+                                        <div class="option">
+                                            <input type="checkbox" class="checkboxOption"
+                                                   value="{{ option }}"
+                                                   {% for result_node in result_permissions %}
+                                                   {% if result_node[1]==
+                                                   user %}
+                                                   {% for option_reslt in
+                                                   result_node[0].split('<br>')%}
+                                            {% if option_reslt == option %}
+                                            checked
+                                            {%endif %}
+                                            {% endfor %}
+                                            {% endif %}
+                                            {% endfor %}
+                                            > {{ option }}
+                                        </div>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="search-icon searchIcon">&#128269;</div>
+                                </div>
+                            </td>
+                            <td style="vertical-align: top;">
+
+                                <div>
+                                    <!-- onclick="event.preventDefault();"
+                                                  <button class="cancelButton">取消</button>-->
+                                    <button class="editButton"
+                                            onclick="event.preventDefault();">
+                                        编辑
+                                    </button>
+                                    <button class="saveButton"
+                                            type="submit"
+                                            name="save_button">
+                                        保存
+                                    </button>
+                                    <button class="cancelButton"
+                                            onclick="event.preventDefault();"
+                                            name="cancelButton">
+                                        取消
+                                    </button>
+
+                                </div>
+                            </td>
+                        </form>
                 </tr>
                 {% endfor %}
             </table>
         </form>
     </div>
 </div>
+<script src="../../static/js/edit_nodes.js"></script>
 {% endblock %}
 </body>
 </html>

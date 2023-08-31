@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
-from templates.data_work.get_task_info import dags_job_all
 from flask import request
+from templates.offline_task.schedule_info import default_engine
 
 
 def get_menus():
@@ -24,70 +24,76 @@ def get_menus():
     return text_values
 
 
-def edit_node(default_engine):
+def edit_permission():
     if request.method == "POST" and "save_button" in request.form:
-        task_name = request.form.get("task_name")
-        dependencies = request.form.get("dependencies")
-        print(task_name, dependencies)
+        user_name = request.form.get("user_name")
+        permissions = request.form.get("dependencies")
         # Split the dependencies string into a list
-        dependency_values = [dep.strip() for dep in dependencies.split(',')]
+        permission_values = [dep.strip() for dep in permissions.split(',')]
 
         # Get the existing dependencies for the given task_name
-        existing_dependencies_query = '''
-                SELECT job_parent_node
-                FROM dags_jobs
-                WHERE job_child_node = %s
+        existing_permission_query = '''
+                SELECT user_menu
+                FROM user_permissions
+                WHERE user_name = %s
             '''
-        existing_dependency_rows = default_engine.execute(existing_dependencies_query,
-                                                          (task_name,)).fetchall()
+        existing_permission_rows = default_engine.execute(existing_permission_query,
+                                                          (user_name,)).fetchall()
 
         # Convert the existing dependencies to a list
-        existing_dependency_values = [row['job_parent_node'] for row in
-                                      existing_dependency_rows]
+        existing_permission_values = [row['user_menu'] for row in
+                                      existing_permission_rows]
 
         # Insert a row for each combination of task_name and a dependency
-        for dep_value in existing_dependency_values:
-            if dep_value not in dependency_values:
+        for dep_value in existing_permission_values:
+            if dep_value not in permission_values:
                 # Delete entries that are no longer in the new input
                 delete_query = '''
-                                DELETE FROM dags_jobs
-                                WHERE job_child_node = %s AND job_parent_node = %s
+                                DELETE FROM user_permissions
+                                WHERE user_name = %s AND user_menu = %s
                             '''
-                default_engine.execute(delete_query, (task_name, dep_value))
+                default_engine.execute(delete_query, (user_name, dep_value))
 
-        for dep_value in dependency_values:
-            if dep_value not in existing_dependency_values:
-                job_name = f"{dep_value}&{task_name}"
+        for dep_value in permission_values:
+            if dep_value not in existing_permission_values:
+                job_name = f"{dep_value}&{user_name}"
                 # Insert each combination into your database table
                 insert_query = '''
-                        replace INTO dags_jobs 
-                        (job_name,job_parent_node, job_child_node)
-                        VALUES (%s, %s, %s)
+                        replace INTO user_permissions 
+                        (user_menu, user_name)
+                        VALUES (%s, %s)
                     '''
-                values = (job_name, dep_value, task_name)
+                values = (dep_value, user_name)
 
                 # Execute the insert query using your database engine (default_engine)
                 default_engine.execute(insert_query, values)
 
     delete_null_query = '''
-    DELETE FROM dags_jobs
-    WHERE job_child_node ='' or 
-    job_parent_node =''
+    DELETE FROM user_permissions
+    WHERE user_name ='' or 
+    user_menu =''
     '''
     default_engine.execute(delete_null_query)
 
 
-def show_edit_nodes(default_engine):
-    dags_nodes = dags_job_all(default_engine)
+def show_edit_permission():
+    user_permission_query = f'''
+            select 
+            user_menu,
+            user_name
+            from user_permissions
+        '''
+    user_permission_list = \
+        default_engine.execute(user_permission_query).fetchall()
 
     # 创建一个新的列表来存储结果
-    result_nodes = []
+    result_permissions = []
 
     # 创建一个字典，用于将相同的第二个元素合并在一起
     merged_data = {}
 
     # 遍历原始数据
-    for item in dags_nodes:
+    for item in user_permission_list:
         key = item[1]  # 第二个元素作为键
         value = item[0]  # 第一个元素作为值
 
@@ -99,6 +105,6 @@ def show_edit_nodes(default_engine):
 
     # 将字典转换为列表，同时将键和值拼接成元组
     for key, value in merged_data.items():
-        result_nodes.append((value, key))
+        result_permissions.append((value, key))
 
-    return result_nodes
+    return result_permissions

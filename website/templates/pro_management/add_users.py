@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect
 import json
+from templates.pro_management.config_permission import get_menus
+from templates.pro_management.config_permission import edit_permission
+from templates.pro_management.config_permission import show_edit_permission
 
 
 def add_users():
@@ -27,8 +30,13 @@ def add_users():
         else:
             message = '<密码不一致>'
     user_list = get_registered_users()
+    menu_lists = get_menus()
+    edit_permission()
+    result_permissions = show_edit_permission()
     return render_template('/pro_management/html/add_users.html',
                            user_list=user_list,
+                           menu_lists=menu_lists,
+                           result_permissions=result_permissions,
                            message=message)
 
 
