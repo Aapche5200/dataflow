@@ -9,7 +9,7 @@ report_conn = create_engine(
     'postgresql+psycopg2://python_etl:xFFUfuXDA4e5CVC1@10.20.121.145:5432/report')
 
 Excel_data = pd.ExcelFile(
-    r'C:\Users\allan.yin\Desktop\数据盘\ah\数据中台-4.8\GP中台.xlsx')
+    r'C:\Users\allan.yin\Desktop\工作交接\数据治理\产品数据治理-完成.xlsx')
 dtype = {
     'pro_model_id': str,
     'pro_id': str,
@@ -17,9 +17,9 @@ dtype = {
     'pro_line_id': str,
     'compare': str
 }
-report_data = pd.read_excel(Excel_data, 'Sheet0', dtype=dtype)
+report_data = pd.read_excel(Excel_data, 'Sheet2', dtype=dtype)
 
-report_data.to_sql('ods_finance_map_relation', con=report_conn, if_exists='append',
+report_data.to_sql('ods_finance_map_relation', con=report_conn, if_exists='replace',
                    index=False)
 
 test_sql = 'select count(*) from ods_finance_map_relation'

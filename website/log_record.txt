@@ -1,23 +1,131 @@
-[2023-08-31 09:31:43] [ERROR] >>>  Main program error:
-[2023-08-31 09:31:43] [ERROR] >>>  cannot schedule new futures after interpreter shutdown
-[2023-08-31 09:31:43] [ERROR] >>>  Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 392, in execute_sql
-    executor.map(process_data_and_insert, [data])
-  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\_base.py", line 598, in map
-    fs = [self.submit(fn, *args) for args in zip(*iterables)]
-  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\_base.py", line 598, in <listcomp>
-    fs = [self.submit(fn, *args) for args in zip(*iterables)]
-  File "C:\Users\allan.yin\Anaconda3\lib\concurrent\futures\thread.py", line 169, in submit
-    raise RuntimeError('cannot schedule new futures after '
-RuntimeError: cannot schedule new futures after interpreter shutdown
+[2023-09-01 05:03:01] [ERROR] >>>  Main program error:
+[2023-09-01 05:03:01] [ERROR] >>>  (psycopg2.errors.InternalError_) tuple concurrently updated (heapam.c:4610)
 
-[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
-[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.982853 seconds)
-[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
-[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.976867 seconds)
-[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
-[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.971856 seconds)
-[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
-[2023-08-31 09:31:43] [DEBUG] >>>  Next wakeup is due at 2023-08-31 15:45:09.614208+08:00 (in 22405.966852 seconds)
-[2023-08-31 09:31:43] [DEBUG] >>>  Looking for jobs to run
-[2023-08-31 09:31:43] [INFO] >>>  Job "execute_sql (trigger: cron[hour='9', minute='30', second='0'], next run at: 2023-09-01 09:30:00 CST)" executed successfully
+[SQL: GRANT SELECT ON TABLE public.ods_zentao_zt_action TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_attend TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_bug TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_build TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_case TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_dept TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_effort TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_history TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_module TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_product TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_productplan TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_project TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectcase TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectproduct TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectstory TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_story TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_task TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_team TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_testrun TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_testtask TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_user TO develop_depart;]
+(Background on this error at: https://sqlalche.me/e/14/2j85)
+[2023-09-01 05:03:01] [ERROR] >>>  Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+psycopg2.errors.InternalError_: tuple concurrently updated (heapam.c:4610)
+
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 289, in execute_sql
+    db_connection.execute(job_sql)
+  File "<string>", line 2, in execute
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
+    return fn(*args, **kwargs)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
+    return connection.execute(statement, *multiparams, **params)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
+    return self._exec_driver_sql(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
+    ret = self._execute_context(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
+    self._handle_dbapi_exception(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
+    util.raise_(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
+    raise exception
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
+    self.dialect.do_execute(
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.InternalError: (psycopg2.errors.InternalError_) tuple concurrently updated (heapam.c:4610)
+
+[SQL: GRANT SELECT ON TABLE public.ods_zentao_zt_action TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_attend TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_bug TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_build TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_case TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_dept TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_effort TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_history TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_module TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_product TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_productplan TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_project TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectcase TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectproduct TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_projectstory TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_story TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_task TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_team TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_testrun TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_testtask TO develop_depart;
+GRANT SELECT ON TABLE public.ods_zentao_zt_user TO develop_depart;]
+(Background on this error at: https://sqlalche.me/e/14/2j85)
+
+[2023-09-01 05:03:01] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-09-02 05:03:00 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 315, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 11, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    username = session['username']
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-01 05:03:02] [DEBUG] >>>  Looking for jobs to run
+[2023-09-01 05:03:02] [DEBUG] >>>  Next wakeup is due at 2023-09-01 05:34:38.439367+08:00 (in 1896.337465 seconds)
+[2023-09-01 05:34:38] [DEBUG] >>>  Looking for jobs to run
+[2023-09-01 05:34:38] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-02 05:34:37 CST)" (scheduled at 2023-09-01 05:34:38.439367+08:00)
+[2023-09-01 05:34:38] [DEBUG] >>>  Next wakeup is due at 2023-09-01 09:30:00+08:00 (in 14121.551048 seconds)
+[2023-09-01 05:34:38] [DEBUG] >>>  Looking for jobs to run
+[2023-09-01 05:34:38] [DEBUG] >>>  Next wakeup is due at 2023-09-01 09:30:00+08:00 (in 14121.539047 seconds)
+[2023-09-01 05:34:38] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-02 05:34:37 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 315, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 11, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    username = session['username']
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.

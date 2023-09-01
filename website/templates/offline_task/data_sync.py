@@ -12,7 +12,7 @@ from templates.dags.dags_task import execute_dependency_jobs
 import pandas as pd
 from templates.pro_management.add_users import get_registered_users
 from templates.offline_task.schedule_info import task_scheduler, default_engine
-from config_dependency import task_node_list, edit_node, show_edit_nodes
+from templates.dags.config_dependency import task_node_list, edit_node, show_edit_nodes
 from templates.data_work.get_task_info import get_users
 
 

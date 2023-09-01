@@ -23,6 +23,7 @@ def disable_cache(view_func):
         response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, ' \
                                             'max-age=0'
         return response
+
     return no_cache
 
 

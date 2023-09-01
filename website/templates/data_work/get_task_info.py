@@ -3,8 +3,11 @@ from flask import session
 
 
 def get_users():
-    username = session['username']
-    return username
+    if 'username' in session:
+        username = session['username']
+        return username
+    else:
+        username='None'
 
 
 def get_task_result(default_engine, now_date):

@@ -114,13 +114,24 @@
         .logout a:hover {
             text-decoration: underline;
         }
+
+        .active {
+            /* 此处设置菜单项处于活动状态的样式 */
+            color: black; /* 未置灰颜色 */
+        }
+
+        .inactive {
+            /* 此处设置菜单项处于不活动状态的样式 */
+            color: gray; /* 置灰颜色 */
+            pointer-events: none; /* 禁用鼠标事件，使其不可点击 */
+        }
     </style>
 </head>
 <body>
 <header>
     <ul>
         <li>
-            <a href="#">离线开发</a>
+            <a href="#">离线开发</a>{{username}}
             <div class="dropdown-content">
                 <a href="/offline_task/html/schedule_task">作业开发</a>
                 <a href="/offline_task/html/data_sync">数据同步</a>
