@@ -77,7 +77,9 @@
                     </a>
                 </td>
                 <td>
-                    <a href="/#">
+                    <a href="javascript:void(0);" class="table-link"
+                       onclick="openPopup('' +
+                        '{{ url_for('show_dags', job_name=execute_result[0]) }}')">
                         查看日志
                     </a>
                 </td>

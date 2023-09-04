@@ -2,34 +2,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>权限配置</title>
+    <title>任务执行日志</title>
 </head>
 <body>
-<h1>用户权限配置</h1>
-
-<form method="POST">
-    <table>
-        <tr>
-            <th>用户名</th>
-            <th>权限</th>
-        </tr>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>
-                <select name="permissions" multiple>
-                    {% for permission in ['menu1', 'menu2', 'menu3'] %}
-                    <option value="{{ permission }}"
-                            {% if permission in user.permissions %}selected{% endif %}>
-                        {{ permission }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </td>
-        </tr>
-        {% endfor %}
+    <table id="logTable">
+        <thead>
+            <tr>
+                <th>任务名称</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <th>任务结果</th>
+                <th>查看日志</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 此处使用服务器端生成的表格行 -->
+        </tbody>
     </table>
-    <button type="submit">保存</button>
-</form>
+
+    <!-- 弹出窗口 -->
+    <div id="logModal" style="display: none;">
+        <pre id="logContent"></pre>
+        <button onclick="closeLogModal()">关闭</button>
+    </div>
+
+    <script>
+        // 示例数据，实际上应该从服务器端获取任务日志数据并填充表格
+        const logData = [
+            // 格式：[任务名称, 开始时间, 结束时间, 任务结果, 日志内容]
+            ["任务1", "2023-09-04 08:00:00", "2023-09-04 08:30:00", "成功", "日志内容1"],
+            ["任务2", "2023-09-04 09:00:00", "2023-09-04 09:30:00", "失败", "日志内容2"],
+            // 添加更多任务日志数据
+        ];
+
+        // 创建表格行并填充数据
+        const tableBody = document.querySelector("#logTable tbody");
+        logData.forEach((logEntry) => {
+            const [taskName, startTime, endTime, taskResult, logContent] = logEntry;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${taskName}</td>
+                <td>${startTime}</td>
+                <td>${endTime}</td>
+                <td>${taskResult}</td>
+                <td><button onclick="showLog('${logContent}')">查看日志</button></td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // 显示日志内容的弹出窗口
+        function showLog(logContent) {
+            const logContentElement = document.querySelector("#logContent");
+            logContentElement.textContent = logContent;
+            const logModal = document.querySelector("#logModal");
+            logModal.style.display = "block";
+        }
+
+        // 关闭弹出窗口
+        function closeLogModal() {
+            const logModal = document.querySelector("#logModal");
+            logModal.style.display = "none";
+        }
+    </script>
 </body>
 </html>

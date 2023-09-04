@@ -280,6 +280,10 @@ def execute_sql(job_name_exe):
     df = pd.read_sql(sql, default_engine)
     deal_infos = []
     logger = logging.getLogger()  # 创建一个自定义的logger
+    # logger.basicConfig(
+    #                     level=logging.DEBUG, filemode='w',
+    #                     format='[%(asctime)s] [%(levelname)s] >>>  %(message)s',
+    #                     datefmt='%Y-%m-%d %I:%M:%S')
     for index, (job_db, job_name, job_sql, job_level, job_owner) in df.iterrows():
         begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         try:

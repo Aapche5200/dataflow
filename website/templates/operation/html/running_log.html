@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>运行日志-Dataflow</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .popup-content {
+            padding: 20px;
+            position: relative;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        input:checked + div {
+            display: block;
+        }
+
+        svg {
+            border: 1px solid #d9d9d9;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .node text {
+            font-weight: 500;
+            font-family: sans-serf;
+            font-size: 12px;
+            pointer-events: none;
+            text-anchor: middle;
+            fill: white;
+        }
+
+        .label g {
+            transform: translate(0, -15px);
+        }
+
+        .edgePath path {
+            stroke: #d9d9d9;
+            stroke-width: 2px;
+        }
+
+        g.type-suss > rect {
+            fill: #08287F;
+        }
+
+        g.type-running > rect {
+            fill: #0FDD83;
+        }
+
+        g.type-wait > rect {
+            fill: #AFA33D;
+        }
+
+        g.type-other > rect {
+            fill: #B60000;
+        }
+
+        #legend {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .legend-item {
+            width: 10px;
+            height: 10px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .legend-label {
+            margin-right: 20px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="../../static/css/styles_upsl.css">
+</head>
+<body>
+<div class="popup-content">
+  <span class="close-button" onclick="closePopup()">×</span>
+  {{log_results}}
+</div>
+<script>
+    function closePopup() {
+        window.close();
+    }
+</script>
+</body>
+</html>
+
