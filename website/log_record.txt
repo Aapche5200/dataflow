@@ -1,131 +1,257 @@
-[2023-09-01 05:03:01] [ERROR] >>>  Main program error:
-[2023-09-01 05:03:01] [ERROR] >>>  (psycopg2.errors.InternalError_) tuple concurrently updated (heapam.c:4610)
-
-[SQL: GRANT SELECT ON TABLE public.ods_zentao_zt_action TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_attend TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_bug TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_build TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_case TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_dept TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_effort TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_history TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_module TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_product TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_productplan TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_project TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectcase TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectproduct TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectstory TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_story TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_task TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_team TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_testrun TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_testtask TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_user TO develop_depart;]
-(Background on this error at: https://sqlalche.me/e/14/2j85)
-[2023-09-01 05:03:01] [ERROR] >>>  Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
-    self.dialect.do_execute(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
-    cursor.execute(statement, parameters)
-psycopg2.errors.InternalError_: tuple concurrently updated (heapam.c:4610)
-
-
-The above exception was the direct cause of the following exception:
-
+[2023-09-04 10:12:32] [INFO] >>>  SQLÖ´ÐÐ³É¹¦: test_temp_aa
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.455957 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.450959 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.445962 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.441960 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.436961 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.431959 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.419959 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.415962 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.411961 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.406959 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.402956 seconds)
+[2023-09-04 10:12:33] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:33] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19955.397954 seconds)
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "POST /offline_task/html/data_sync HTTP/1.1" 200 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/js/search_more.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/js/option_get_json.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/js/edit_nodes.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:33] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:33] "[36mGET /static/config.json HTTP/1.1[0m" 304 -
+[2023-09-04 10:12:40] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:40] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19947.707942 seconds)
+[2023-09-04 10:12:40] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:12:40] [ERROR] >>>  Exception on /offline_task/html/data_sync [POST]
 Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 289, in execute_sql
-    db_connection.execute(job_sql)
-  File "<string>", line 2, in execute
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\deprecations.py", line 402, in warned
-    return fn(*args, **kwargs)
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 3176, in execute
-    return connection.execute(statement, *multiparams, **params)
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1291, in execute
-    return self._exec_driver_sql(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1595, in _exec_driver_sql
-    ret = self._execute_context(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1862, in _execute_context
-    self._handle_dbapi_exception(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 2043, in _handle_dbapi_exception
-    util.raise_(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\util\compat.py", line 208, in raise_
-    raise exception
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\base.py", line 1819, in _execute_context
-    self.dialect.do_execute(
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\sqlalchemy\engine\default.py", line 732, in do_execute
-    cursor.execute(statement, parameters)
-sqlalchemy.exc.InternalError: (psycopg2.errors.InternalError_) tuple concurrently updated (heapam.c:4610)
-
-[SQL: GRANT SELECT ON TABLE public.ods_zentao_zt_action TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_attend TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_bug TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_build TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_case TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_dept TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_effort TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_history TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_module TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_product TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_productplan TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_project TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectcase TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectproduct TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_projectstory TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_story TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_task TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_team TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_testrun TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_testtask TO develop_depart;
-GRANT SELECT ON TABLE public.ods_zentao_zt_user TO develop_depart;]
-(Background on this error at: https://sqlalche.me/e/14/2j85)
-
-[2023-09-01 05:03:01] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-09-02 05:03:00 CST)" raised an exception
-Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 315, in execute_sql
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
     execute_dependency_jobs(default_engine)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
-    job_result_all = get_task_result(default_engine, 0)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 11, in get_task_result
-    username = get_users()
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
-    username = session['username']
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
-    obj = instance._get_current_object()
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
-    raise RuntimeError(unbound_message) from None
-RuntimeError: Working outside of request context.
-
-This typically means that you attempted to use functionality that needed
-an active HTTP request. Consult the documentation on testing for
-information about how to avoid this problem.
-[2023-09-01 05:03:02] [DEBUG] >>>  Looking for jobs to run
-[2023-09-01 05:03:02] [DEBUG] >>>  Next wakeup is due at 2023-09-01 05:34:38.439367+08:00 (in 1896.337465 seconds)
-[2023-09-01 05:34:38] [DEBUG] >>>  Looking for jobs to run
-[2023-09-01 05:34:38] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-02 05:34:37 CST)" (scheduled at 2023-09-01 05:34:38.439367+08:00)
-[2023-09-01 05:34:38] [DEBUG] >>>  Next wakeup is due at 2023-09-01 09:30:00+08:00 (in 14121.551048 seconds)
-[2023-09-01 05:34:38] [DEBUG] >>>  Looking for jobs to run
-[2023-09-01 05:34:38] [DEBUG] >>>  Next wakeup is due at 2023-09-01 09:30:00+08:00 (in 14121.539047 seconds)
-[2023-09-01 05:34:38] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-02 05:34:37 CST)" raised an exception
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:12:40] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19947.701948 seconds)
+[2023-09-04 10:12:40] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:40] "[33mPOST /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:12:40] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:40] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:12:40] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:12:40] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:13:00] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:13:00] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19928.410881 seconds)
+[2023-09-04 10:13:00] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:13:00] [ERROR] >>>  Exception on /offline_task/html/data_sync [POST]
 Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
-    retval = job.func(*job.args, **job.kwargs)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 315, in execute_sql
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
     execute_dependency_jobs(default_engine)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
-    job_result_all = get_task_result(default_engine, 0)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 11, in get_task_result
-    username = get_users()
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
-    username = session['username']
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
-    obj = instance._get_current_object()
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
-    raise RuntimeError(unbound_message) from None
-RuntimeError: Working outside of request context.
-
-This typically means that you attempted to use functionality that needed
-an active HTTP request. Consult the documentation on testing for
-information about how to avoid this problem.
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:13:00] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19928.405870 seconds)
+[2023-09-04 10:13:00] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:13:00] "[33mPOST /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:13:00] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:13:00] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:13:00] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:13:00] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:15:36] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:15:36] [ERROR] >>>  Exception on /offline_task/html/data_sync [POST]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:15:36] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19771.960462 seconds)
+[2023-09-04 10:15:36] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:15:36] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:15:36] "[33mPOST /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:15:36] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19771.955462 seconds)
+[2023-09-04 10:15:36] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:15:36] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:15:36] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:15:36] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:18:35] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:35] [ERROR] >>>  Exception on /offline_task/html/data_sync [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:18:35] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19592.682978 seconds)
+[2023-09-04 10:18:35] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:35] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:35] "[33mGET /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:35] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19592.676978 seconds)
+[2023-09-04 10:18:35] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:35] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:35] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:35] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:18:38] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:38] [ERROR] >>>  Exception on /offline_task/html/data_sync [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:18:38] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19590.274981 seconds)
+[2023-09-04 10:18:38] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:38] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:38] "[33mGET /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:38] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19590.269968 seconds)
+[2023-09-04 10:18:38] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:38] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:38] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:38] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:18:41] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:41] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19587.233963 seconds)
+[2023-09-04 10:18:41] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:41] [ERROR] >>>  Exception on /offline_task/html/schedule_task [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 22, in no_cache
+    response = make_response(view_func(*args, **kwargs))
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 153, in schedule_task
+    return schedule_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 87, in schedule_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:18:41] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19587.228973 seconds)
+[2023-09-04 10:18:41] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:41] "[33mGET /offline_task/html/schedule_task HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:43] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:43] [ERROR] >>>  Exception on /offline_task/html/data_sync [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:18:43] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19585.008957 seconds)
+[2023-09-04 10:18:43] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:18:43] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:43] "[33mGET /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:43] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19585.003968 seconds)
+[2023-09-04 10:18:43] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:43] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:18:43] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:18:43] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:02] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:19:02] [ERROR] >>>  Exception on /offline_task/html/schedule_task [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 22, in no_cache
+    response = make_response(view_func(*args, **kwargs))
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 153, in schedule_task
+    return schedule_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 87, in schedule_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:19:02] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19566.433917 seconds)
+[2023-09-04 10:19:02] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:19:02] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:02] "[33mGET /offline_task/html/schedule_task HTTP/1.1[0m" 404 -
+[2023-09-04 10:19:02] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19566.427909 seconds)
+[2023-09-04 10:19:02] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:02] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:19:02] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:02] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "GET /property HTTP/1.1" 200 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/js/pagination.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/js/diag.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/js/d3.min.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:03] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:03] "[36mGET /static/js/dagre-d3.js HTTP/1.1[0m" 304 -
+[2023-09-04 10:19:05] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:19:05] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19563.322899 seconds)
+[2023-09-04 10:19:05] [DEBUG] >>>  Looking for jobs to run
+[2023-09-04 10:19:05] [ERROR] >>>  Exception on /offline_task/html/data_sync [GET]
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 158, in sync_task
+    return sync_tasks()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 90, in sync_tasks
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 41, in execute_dependency_jobs
+    next_result = job_results_other[next_job_id]
+KeyError: 'test_temp_bb'
+[2023-09-04 10:19:05] [DEBUG] >>>  Next wakeup is due at 2023-09-04 15:45:08.456801+08:00 (in 19563.317897 seconds)
+[2023-09-04 10:19:05] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:05] "[33mGET /offline_task/html/data_sync HTTP/1.1[0m" 404 -
+[2023-09-04 10:19:05] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:05] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-04 10:19:05] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 10:19:05] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -

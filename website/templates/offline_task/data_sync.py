@@ -21,10 +21,7 @@ def sync_tasks():
     action = request.form.get('action')
     if len(selected_jobs) > 0:
         tasks = get_tasks_from_db(selected_jobs)
-        if action == '确定删除':
-            # Delete selected jobs from the database
-            delete_jobs(selected_jobs)
-        elif action == '停用':
+        if action == '停用':
             # Update the status of selected jobs to '停用'
             update_job_status(selected_jobs, '停用')
         elif action == '启用':
@@ -69,6 +66,10 @@ def sync_tasks():
     for remove_task in tasks_all:
         remove_job_name = remove_task[0]
         remove_task_status = remove_task[3]
+        if len(selected_jobs) > 0:
+            if action == '确定删除' and remove_task_status == '停用':
+                # Delete selected jobs from the database
+                delete_jobs(selected_jobs)
         if task_scheduler.get_job(
                 job_id=str(remove_job_name)) and remove_task_status == '停用':
             if task_scheduler.state == 1:
@@ -287,6 +288,10 @@ def execute_sql(job_name_exe):
         order by level_sort'''
     df = pd.read_sql(sql, default_engine)
     deal_infos = []
+    logging.basicConfig(filename='log_record.txt',
+                        level=logging.DEBUG, filemode='w',
+                        format='[%(asctime)s] [%(levelname)s] >>>  %(message)s',
+                        datefmt='%Y-%m-%d %I:%M:%S')
     for index, (job_db, job_name, job_sql, job_level, job_owner) in df.iterrows():
         begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         try:
@@ -398,15 +403,13 @@ def execute_sql(job_name_exe):
                     print(offset)
 
                 job_result = 'T'
+                logging.info(f'SQL执行成功: {job_name_exe}')
             else:
                 job_result = '未找到对应的数据源或目标'
+                logging.info(f'数据源异常，请排查: {job_name_exe}')
             print(job_result)
         except Exception as e:
             job_result = 'F'
-            logging.basicConfig(filename='log_record.txt',
-                                level=logging.DEBUG, filemode='w',
-                                format='[%(asctime)s] [%(levelname)s] >>>  %(message)s',
-                                datefmt='%Y-%m-%d %I:%M:%S')
             logging.error("Main program error:")
             logging.error(e)
             logging.error(traceback.format_exc())
