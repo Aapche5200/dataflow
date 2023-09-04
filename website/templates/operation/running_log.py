@@ -1,18 +1,16 @@
-from flask import Flask, request, render_template
-from templates.data_work.get_task_info import dags_job_all
-from templates.data_work.get_task_info import get_task_time, get_task_result
-from datetime import datetime
+from flask import render_template,request
+import datetime
 from templates.offline_task.schedule_info import default_engine
-from datetime import datetime, timedelta
 
 
-def show_dag(task_name, now_date):
-    if not now_date:
-        now_date = datetime.date.today().strftime("%Y-%m-%d")
+def show_running_logs(job_name):
+    now_date_center = request.form.get('now_date')
+    if not now_date_center:
+        now_date_center = datetime.date.today().strftime("%Y-%m-%d")
     get_task_result_query = f'''
         SELECT
     	t1.job_name,
-    	COALESCE(job_log,'等待执行')
+    	COALESCE(job_log,'等待执行') as job_log
         FROM
     	ods_task_job_schedule_pool AS t1
     	LEFT JOIN (
@@ -28,12 +26,13 @@ def show_dag(task_name, now_date):
     		ods_task_job_execute_log AS tt1
     		LEFT JOIN apscheduler_jobs AS tt2 ON tt1.job_name = tt2.id 
     	WHERE
-    	date( end_time ) = date( '{now_date}' ) 
+    	date( end_time ) = date( '{now_date_center}' ) 
     	)as tt 	where rank_time=1 
     	) AS t2 ON t1.job_name = t2.job_name
-    	where job_name='{task_name}'
+    	where t1.job_name='{job_name}'
             '''
-    log_results = default_engine.execute(get_task_result_query).fetchall()
+    log_results = default_engine.execute(get_task_result_query).fetchone()[1]
+    print(log_results)
 
     return render_template('/operation/html/running_log.html',
                            log_results=log_results)

@@ -11,6 +11,7 @@ from templates.users.user_login import check_login, login, logout
 from templates.pro_management.add_users import add_users
 from templates.pro_management.data_source import data_sources
 from templates.operation.instances_dag import show_dag
+from templates.operation.running_log import show_running_logs
 from db_con import DbCon
 from functools import wraps
 from flask import make_response
@@ -140,6 +141,11 @@ def overview():
 @app.route('/operation/html/operation', methods=['GET', 'POST'])
 def operation_center():
     return operation()
+
+
+@app.route('/operation/html/dags/<job_name>', methods=['GET', 'POST'])
+def show_running_log(job_name):
+    return show_running_logs(job_name)
 
 
 @app.route('/operation/html/<task_name>', methods=['GET', 'POST'])

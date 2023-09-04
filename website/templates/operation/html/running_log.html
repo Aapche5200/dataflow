@@ -97,7 +97,7 @@
 <body>
 <div class="popup-content">
   <span class="close-button" onclick="closePopup()">×</span>
-  {{log_results}}
+  {{log_results|replace("\n", "<br>")|safe}}
 </div>
 <script>
     function closePopup() {
