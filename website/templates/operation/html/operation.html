@@ -53,6 +53,7 @@
                 <th>结束时间</th>
                 <th>耗时</th>
                 <th>DAGS</th>
+                <th>运行日志</th>
             </tr>
             {% for execute_result in operation_message %}
             <tr>
@@ -73,6 +74,11 @@
                        onclick="openPopup('' +
                         '{{ url_for('show_dags', task_name=execute_result[0]) }}')">
                         DAG图
+                    </a>
+                </td>
+                <td>
+                    <a href="/#">
+                        查看日志
                     </a>
                 </td>
             </tr>

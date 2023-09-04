@@ -279,7 +279,7 @@ def execute_sql(job_name_exe):
     order by level_sort'''
     df = pd.read_sql(sql, default_engine)
     deal_infos = []
-
+    logger = logging.getLogger()  # 创建一个自定义的logger
     for index, (job_db, job_name, job_sql, job_level, job_owner) in df.iterrows():
         begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         try:
@@ -293,22 +293,20 @@ def execute_sql(job_name_exe):
             elif job_level == 'python':
                 exec(job_sql)
                 job_result = 'T'
+            error_message = f'执行完成: {job_name_exe}'  # 构建日志消息
+            logger.info(error_message)  # 记录日志消息
         except Exception as e:
             job_result = 'F'
-            logging.basicConfig(filename='log_record.txt',
-                                level=logging.DEBUG, filemode='w',
-                                format='[%(asctime)s] [%(levelname)s] >>>  %(message)s',
-                                datefmt='%Y-%m-%d %I:%M:%S')
-            logging.error("Main program error:")
-            logging.error(e)
-            logging.error(traceback.format_exc())
+            # 使用error级别记录异常信息
+            error_message = str(e)
+            logger.error(error_message)
         print(job_result)
         end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         deal_infos.append(
             [job_name, job_sql, begin_time, end_time, job_result, job_db, job_level,
-             job_owner])
+             job_owner, error_message])
     columns = ['job_name', 'job_sql', 'begin_time', 'end_time', 'job_result', 'job_db',
-               'job_level', 'job_owner']
+               'job_level', 'job_owner', 'job_log']
     job_deal_df = pd.DataFrame(deal_infos, columns=columns)
     table = 'ods_task_job_execute_log'
     job_deal_df.to_sql(table, default_engine, if_exists='append', index=False)
