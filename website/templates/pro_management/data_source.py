@@ -61,7 +61,7 @@ def testlink_job():
     data_url = request.form.get('data_url')
 
     if data_type == 'SqlServer':
-        header = 'mssql+pymssql:'
+        header = 'mssql+pymssql://'
         url = header + data_url
         try:
             system_type = create_engine(url)
@@ -75,7 +75,7 @@ def testlink_job():
 
 
     elif data_type == 'Greenplum':
-        header = 'postgresql+psycopg2:'
+        header = 'postgresql+psycopg2://'
         url = header + data_url
         try:
             system_type = create_engine(url)
@@ -88,7 +88,7 @@ def testlink_job():
             message_testlink = '<连接失败，请检查!>'
 
     elif data_type == 'Mysql':
-        header = 'mysql+pymysql:'
+        header = 'mysql+pymysql://'
         url = header + data_url
         try:
             system_type = create_engine(url)

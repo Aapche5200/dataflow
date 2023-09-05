@@ -32,16 +32,16 @@ class DbCon:
             for db_type, url in config.items():
                 if "SqlServer" in db_type:
                     # SQL Server
-                    engine_url = f"mssql+pymssql:{url}?charset=utf8"
+                    engine_url = f"mssql+pymssql://{url}?charset=utf8"
                 elif "Greenplum" in db_type:
                     # Greenplum
-                    engine_url = f"postgresql+psycopg2:{url}"
+                    engine_url = f"postgresql+psycopg2://{url}"
                 elif "Mysql" in db_type:
                     # Mysql
-                    engine_url = f"mysql+pymysql:{url}"
+                    engine_url = f"mysql+pymysql://{url}"
                 else:
                     # 其他数据库类型，假设这里是 MySQL
-                    engine_url = f"mysql:{url}"  # 根据实际情况修改前缀
+                    engine_url = f"mysql://{url}"  # 根据实际情况修改前缀
 
                 # 创建连接
                 if name not in self.engines:
