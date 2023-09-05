@@ -1,13 +1,12 @@
-from flask import render_template,request
+from flask import render_template,request,session
 import datetime
 from templates.offline_task.schedule_info import default_engine
 
 
 def show_running_logs(job_name):
-    now_date_center = request.form.get('now_date')
-    print(now_date_center)
-    if not now_date_center:
-        now_date_center = datetime.date.today().strftime("%Y-%m-%d")
+    now_date = session.get('now_date')
+    if not now_date:
+        now_date = datetime.date.today().strftime("%Y-%m-%d")
     get_task_result_query = f'''
         SELECT
     	t1.job_name,
@@ -27,7 +26,7 @@ def show_running_logs(job_name):
     		ods_task_job_execute_log AS tt1
     		LEFT JOIN apscheduler_jobs AS tt2 ON tt1.job_name = tt2.id 
     	WHERE
-    	date( end_time ) = date( '{now_date_center}' ) 
+    	date( end_time ) = date( '{now_date}' ) 
     	)as tt 	where rank_time=1 
     	) AS t2 ON t1.job_name = t2.job_name
     	where t1.job_name='{job_name}'
