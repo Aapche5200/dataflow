@@ -5,6 +5,7 @@ from templates.offline_task.schedule_info import default_engine
 
 def show_running_logs(job_name):
     now_date_center = request.form.get('now_date')
+    print(now_date_center)
     if not now_date_center:
         now_date_center = datetime.date.today().strftime("%Y-%m-%d")
     get_task_result_query = f'''
@@ -32,7 +33,6 @@ def show_running_logs(job_name):
     	where t1.job_name='{job_name}'
             '''
     log_results = default_engine.execute(get_task_result_query).fetchone()[1]
-    print(log_results)
 
     return render_template('/operation/html/running_log.html',
                            log_results=log_results)

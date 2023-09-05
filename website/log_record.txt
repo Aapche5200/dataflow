@@ -1,36 +1,35 @@
-[2023-09-04 02:16:04] [INFO] >>>  Ö´ÐÐÍê³É: job1
-[2023-09-04 02:16:04] [ERROR] >>>  'str' object has no attribute 'append'
-[2023-09-04 02:16:04] [ERROR] >>>  Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    error_message.append(error_message)
-AttributeError: 'str' object has no attribute 'append'
+[2023-09-05 09:50:36] [ERROR] >>>  Main program error:
+[2023-09-05 09:50:36] [ERROR] >>>  [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
+[2023-09-05 09:50:36] [ERROR] >>>  Traceback (most recent call last):
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 403, in execute_sql
+    print(offset)
+OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
 
-[2023-09-04 02:16:04] [ERROR] >>>  Exception on /offline_task/html/schedule_task [POST]
+[2023-09-05 09:50:36] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='9', minute='30', second='0'], next run at: 2023-09-06 09:30:00 CST)" raised an exception
 Traceback (most recent call last):
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 302, in execute_sql
-    error_message.append(error_message)
-AttributeError: 'str' object has no attribute 'append'
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 403, in execute_sql
+    print(offset)
+OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
 
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 2525, in wsgi_app
-    response = self.full_dispatch_request()
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1822, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1820, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\flask\app.py", line 1796, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 22, in no_cache
-    response = make_response(view_func(*args, **kwargs))
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\app.py", line 153, in schedule_task
-    return schedule_tasks()
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 33, in schedule_tasks
-    execute_sql(job_name)
-  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 310, in execute_sql
-    error_message.append(error_message)
-AttributeError: 'str' object has no attribute 'append'
-[2023-09-04 02:16:04] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 14:16:04] "[33mPOST /offline_task/html/schedule_task HTTP/1.1[0m" 404 -
-[2023-09-04 02:16:04] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 14:16:04] "[33mGET /offline_task/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
-[2023-09-04 02:16:04] [INFO] >>>  10.60.4.29 - - [04/Sep/2023 14:16:04] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 416, in execute_sql
+    print(job_result)
+OSError: [WinError 233] ¹ÜµÀµÄÁíÒ»¶ËÉÏÎÞÈÎºÎ½ø³Ì¡£
+[2023-09-05 09:58:14] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:14] "[32mGET /update HTTP/1.1[0m" 302 -
+[2023-09-05 09:58:14] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:14] "GET /users/html/users_login HTTP/1.1" 200 -
+[2023-09-05 09:58:14] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:14] "[32mGET /static/dataflow.ico HTTP/1.1[0m" 302 -
+[2023-09-05 09:58:14] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:14] "GET /users/html/users_login HTTP/1.1" 200 -
+[2023-09-05 09:58:17] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:17] "[32mPOST /users/html/users_login HTTP/1.1[0m" 302 -
+[2023-09-05 09:58:17] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:17] "GET / HTTP/1.1" 200 -
+[2023-09-05 09:58:17] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:17] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-05 09:58:17] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:17] "GET /static/dataflow.ico HTTP/1.1" 200 -
+[2023-09-05 09:58:20] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:20] "GET /update HTTP/1.1" 200 -
+[2023-09-05 09:58:20] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:20] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-05 09:58:20] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:20] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-05 09:58:35] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:35] "GET / HTTP/1.1" 200 -
+[2023-09-05 09:58:35] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:35] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-05 09:58:35] [INFO] >>>  10.60.4.29 - - [05/Sep/2023 09:58:35] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -

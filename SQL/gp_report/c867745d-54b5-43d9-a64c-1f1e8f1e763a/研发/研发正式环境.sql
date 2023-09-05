@@ -16,7 +16,7 @@ from (select case when t2.二级部门 = '智能检测与终端产品线' then '
       from ex_ods_oa_abv5_formmain_10037 as t1
                join ex_ods_oa_abv5_depart_level_all as t2 on t1.field0200 = cast(t2."部门ID" as text)
       where field0180 = '-7808949530931608431'
-        and t2.二级部门 in ('智能检测与终端产品线', '基础安全产品线', 'AiLPHA大数据智能安全产品线', '云产品线')
+        and t2.二级部门 in ('智能检测与终端产品线', '基础安全产品线', 'AiLPHA态势感知产品线', '日志与流量产品部','数据安全产品线','云产品线')
       group by case when t2.二级部门 = '智能检测与终端产品线' then '智能检测与终端产品线' else t2.二级部门 end, t1.field0002,
                t1.field0006, t2.二级部门) as tt1
 group by tt1.cpxname;
@@ -326,9 +326,9 @@ insert into ads_gp_rm_t_hr_cp_inf_df
           left join
       (select t1.cpxid    需求表产品线ID,
               t1.cpx_name 产品线名称,
-              t2.cp_class,
+              null cp_class,
               'null' as   需求表产品ID,
-              t2.cp_name  产品名称
+              t2.financial_pro_class_name  产品名称
        from (select cpxid
                   , cpxmc
                   , case when cpxmc = '智能检测与终端产品线' then '智能检测与终端产品线' else cpxmc end cpx_name
@@ -336,10 +336,10 @@ insert into ads_gp_rm_t_hr_cp_inf_df
              group by cpxid
                     , cpxmc
                     , case when cpxmc = '智能检测与终端产品线' then '智能检测与终端产品线' else cpxmc end) as t1
-                left join ods_oa_finance_cp_map_relation as t2 on t1.cpx_name = t2.cpx_name) as t2
+                left join ods_finance_map_relation as t2 on t1.cpx_name = t2.financial_pro_line_name) as t2
       on t1.id = t2.需求表产品线ID
  where 员工工号 is not null  and
-       产品线名称 in ('基础安全产品线','智能检测与终端产品线','AiLPHA大数据智能安全产品线','云产品线')
+       产品线名称 in ('基础安全产品线','智能检测与终端产品线','AiLPHA态势感知产品线', '日志与流量产品部','数据安全产品线','云产品线')
  group by 员工工号,
           em_name,
           t2.需求表产品线ID,
@@ -348,7 +348,7 @@ insert into ads_gp_rm_t_hr_cp_inf_df
           t2.产品线名称,
           t2.cp_class);
 
-
+select * from ex_ods_pass_ecology_matrixtable_6
 --⑨商机项目预测状态数据
 delete
 from ads_oa_t_shangji_status_sales_df;
