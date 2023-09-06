@@ -10,9 +10,6 @@
     "gp_test": {
         "Greenplum": "python_etl:xFFUfuXDA4e5CVC1@10.20.121.145:5432/report"
     },
-    "gp_middleground": {
-        "Greenplum": "python_etl:xFFUfuXDA4e5CVC1@10.20.121.231:5432/report"
-    },
     "oa": {
         "SqlServer": "sjfx:5VvXTWS%nfbPRex1Sb@10.20.120.114:1433/ABV5"
     }

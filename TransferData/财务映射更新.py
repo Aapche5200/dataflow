@@ -17,9 +17,9 @@ dtype = {
     'pro_line_id': str,
     'compare': str
 }
-report_data = pd.read_excel(Excel_data, 'Sheet2', dtype=dtype)
+report_data = pd.read_excel(Excel_data, '补充产线ID', dtype=dtype)
 
-report_data.to_sql('ods_finance_map_relation', con=report_conn, if_exists='replace',
+report_data.to_sql('ods_finance_map_relation', con=report_conn, if_exists='append',
                    index=False)
 
 test_sql = 'select count(*) from ods_finance_map_relation'
