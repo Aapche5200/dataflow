@@ -285,3 +285,10 @@ a.table-link:hover {
     top: 0; /* Position it at the top of the td */
     left: 0; /* Align it with the left of the td */
 }
+
+.center-content {
+    display: flex;
+    justify-content: center; /* 水平居中对齐 */
+    align-items: center; /* 垂直居中对齐 */
+    margin: 0 auto; /* 垂直居中 */
+}
