@@ -464,3 +464,214 @@ RuntimeError: Working outside of request context.
 This typically means that you attempted to use functionality that needed
 an active HTTP request. Consult the documentation on testing for
 information about how to avoid this problem.
+[2023-09-06 06:29:33] [INFO] >>>  10.60.4.29 - - [06/Sep/2023 18:29:33] "GET /pro_management/html/data_source HTTP/1.1" 200 -
+[2023-09-06 06:29:33] [INFO] >>>  10.60.4.29 - - [06/Sep/2023 18:29:33] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-06 06:29:33] [INFO] >>>  10.60.4.29 - - [06/Sep/2023 18:29:33] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-07 02:40:00] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 02:40:00] [WARNING] >>>  Error getting due jobs from job store 'default': (pymysql.err.OperationalError) (2006, "MySQL server has gone away (ConnectionAbortedError(10053, 'ÄãµÄÖ÷»úÖÐµÄÈí¼þÖÐÖ¹ÁËÒ»¸öÒÑ½¨Á¢µÄÁ¬½Ó¡£', None, 10053, None))")
+[SQL: SELECT apscheduler_jobs.id, apscheduler_jobs.job_state 
+FROM apscheduler_jobs 
+WHERE apscheduler_jobs.next_run_time <= %(next_run_time_1)s ORDER BY apscheduler_jobs.next_run_time]
+[parameters: {'next_run_time_1': 1694025600.223272}]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+[2023-09-07 02:40:00] [DEBUG] >>>  Next wakeup is due at 2023-09-07 02:40:10.223272+08:00 (in 10.000000 seconds)
+[2023-09-07 02:40:10] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 02:40:10] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='2', minute='40', second='0'], next run at: 2023-09-08 02:40:02 CST)" (scheduled at 2023-09-07 02:40:00.078386+08:00)
+[2023-09-07 02:40:10] [DEBUG] >>>  Next wakeup is due at 2023-09-07 04:17:21.325904+08:00 (in 5831.100599 seconds)
+[2023-09-07 02:40:10] [INFO] >>>  SQLÖ´ÐÐ³É¹¦: test_temp_aa
+[2023-09-07 02:40:10] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='2', minute='40', second='0'], next run at: 2023-09-08 02:40:02 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 426, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 04:17:21] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 04:17:21] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='4', minute='17', second='0'], next run at: 2023-09-08 04:17:43 CST)" (scheduled at 2023-09-07 04:17:21.325904+08:00)
+[2023-09-07 04:17:21] [DEBUG] >>>  Next wakeup is due at 2023-09-07 05:03:12.074628+08:00 (in 2750.711926 seconds)
+[2023-09-07 04:17:24] [INFO] >>>  Ö´ÐÐÍê³É: func_ads_gp_oa_t_area_unit_sales_dd
+[2023-09-07 04:17:24] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='4', minute='17', second='0'], next run at: 2023-09-08 04:17:43 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 317, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 05:03:12] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 05:03:12] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-09-08 05:03:01 CST)" (scheduled at 2023-09-07 05:03:12.074628+08:00)
+[2023-09-07 05:03:12] [DEBUG] >>>  Next wakeup is due at 2023-09-07 05:18:26.896603+08:00 (in 914.801243 seconds)
+[2023-09-07 05:03:12] [INFO] >>>  Ö´ÐÐÍê³É: func_grant_select_develop_depart
+[2023-09-07 05:03:12] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='3', second='0'], next run at: 2023-09-08 05:03:01 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 317, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 05:18:26] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 05:18:26] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='18', second='0'], next run at: 2023-09-08 05:18:35 CST)" (scheduled at 2023-09-07 05:18:26.896603+08:00)
+[2023-09-07 05:18:26] [DEBUG] >>>  Next wakeup is due at 2023-09-07 05:34:53.548519+08:00 (in 986.637371 seconds)
+[2023-09-07 05:18:33] [INFO] >>>  Ö´ÐÐÍê³É: func_formmain_129544
+[2023-09-07 05:18:33] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='18', second='0'], next run at: 2023-09-08 05:18:35 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 317, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 05:34:53] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 05:34:53] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-08 05:34:02 CST)" (scheduled at 2023-09-07 05:34:53.548519+08:00)
+[2023-09-07 05:34:53] [DEBUG] >>>  Next wakeup is due at 2023-09-07 09:30:00+08:00 (in 14106.435877 seconds)
+[2023-09-07 05:34:54] [INFO] >>>  Ö´ÐÐÍê³É: func_ads_gp_all_t_cpx_cp_zhibiao_df
+[2023-09-07 05:34:54] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='5', minute='34', second='0'], next run at: 2023-09-08 05:34:02 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 317, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 08:53:34] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:53:34] "GET /operation/html/operation HTTP/1.1" 200 -
+[2023-09-07 08:53:35] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:53:35] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-07 08:53:35] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:53:35] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-07 08:53:35] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:53:35] "[36mGET /static/js/search_more.js HTTP/1.1[0m" 304 -
+[2023-09-07 08:58:12] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:58:12] "GET /operation/html/dags/func_ads_gp_oa_t_area_unit_sales_dd HTTP/1.1" 200 -
+[2023-09-07 08:58:12] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:58:12] "[33mGET /operation/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-07 08:58:15] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:58:15] "GET /operation/html/dags/job4 HTTP/1.1" 200 -
+[2023-09-07 08:58:15] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 08:58:15] "[33mGET /operation/static/css/styles_upsl.css HTTP/1.1[0m" 404 -
+[2023-09-07 09:30:00] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:30:00] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='9', minute='30', second='0'], next run at: 2023-09-08 09:30:00 CST)" (scheduled at 2023-09-07 09:30:00+08:00)
+[2023-09-07 09:30:00] [DEBUG] >>>  Next wakeup is due at 2023-09-07 09:36:32.392199+08:00 (in 392.338786 seconds)
+[2023-09-07 09:36:32] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:36:32] [INFO] >>>  Running job "execute_sql (trigger: cron[hour='9', minute='36', second='0'], next run at: 2023-09-07 09:36:32 CST)" (scheduled at 2023-09-07 09:36:32.392199+08:00)
+[2023-09-07 09:36:32] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18571.457601 seconds)
+[2023-09-07 09:36:32] [INFO] >>>  Ö´ÐÐÍê³É: job6
+[2023-09-07 09:36:32] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='9', minute='36', second='0'], next run at: 2023-09-08 09:36:09 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\schedule_task.py", line 317, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
+[2023-09-07 09:37:17] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:37:17] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18526.281511 seconds)
+[2023-09-07 09:37:17] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:37:17] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18526.267512 seconds)
+[2023-09-07 09:37:17] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:37:17] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18526.261513 seconds)
+[2023-09-07 09:37:17] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:37:17] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18526.257499 seconds)
+[2023-09-07 09:37:17] [DEBUG] >>>  Looking for jobs to run
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "GET /offline_task/html/schedule_task HTTP/1.1" 200 -
+[2023-09-07 09:37:17] [DEBUG] >>>  Next wakeup is due at 2023-09-07 14:46:03.875051+08:00 (in 18526.248512 seconds)
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/css/styles_upsl.css HTTP/1.1[0m" 304 -
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/js/search_more.js HTTP/1.1[0m" 304 -
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/dataflow.ico HTTP/1.1[0m" 304 -
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/js/option_get_json.js HTTP/1.1[0m" 304 -
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/js/edit_nodes.js HTTP/1.1[0m" 304 -
+[2023-09-07 09:37:17] [INFO] >>>  10.60.4.29 - - [07/Sep/2023 09:37:17] "[36mGET /static/config.json HTTP/1.1[0m" 304 -
+[2023-09-07 09:44:32] [INFO] >>>  SQLÖ´ÐÐ³É¹¦: func_ods_2156_shangji_detail
+[2023-09-07 09:44:32] [ERROR] >>>  Job "execute_sql (trigger: cron[hour='9', minute='30', second='0'], next run at: 2023-09-08 09:30:00 CST)" raised an exception
+Traceback (most recent call last):
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\apscheduler\executors\base.py", line 125, in run_job
+    retval = job.func(*job.args, **job.kwargs)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\offline_task\data_sync.py", line 426, in execute_sql
+    execute_dependency_jobs(default_engine)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\dags\dags_task.py", line 15, in execute_dependency_jobs
+    job_result_all = get_task_result(default_engine, 0)
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 14, in get_task_result
+    username = get_users()
+  File "C:\Users\allan.yin\PycharmProjects\pythonProject\ah\website\templates\data_work\get_task_info.py", line 6, in get_users
+    if 'username' in session:
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 316, in __get__
+    obj = instance._get_current_object()
+  File "C:\Users\allan.yin\Anaconda3\lib\site-packages\werkzeug\local.py", line 513, in _get_current_object
+    raise RuntimeError(unbound_message) from None
+RuntimeError: Working outside of request context.
+
+This typically means that you attempted to use functionality that needed
+an active HTTP request. Consult the documentation on testing for
+information about how to avoid this problem.
