@@ -16,7 +16,7 @@ def get_user_json():
 
 def check_login():
     # 排除不需要登录检查的路由
-    if request.endpoint in ['users_login']:
+    if request.endpoint in ['users_login','static']:
         return
 
     if 'username' not in session:
