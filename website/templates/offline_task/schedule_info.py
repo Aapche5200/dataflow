@@ -12,7 +12,8 @@ default_engine = get_default_engin()
 jobstore = SQLAlchemyJobStore(engine=default_engine)
 
 # 创建调度器并指定作业存储器
-task_scheduler = BackgroundScheduler(jobstores={'default': jobstore}, executors=executors)
+task_scheduler = BackgroundScheduler(jobstores={'default': jobstore},
+                                     executors=executors)
 
 if task_scheduler.state == 0:
     task_scheduler.start()

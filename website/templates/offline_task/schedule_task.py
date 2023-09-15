@@ -10,6 +10,8 @@ from templates.pro_management.add_users import get_registered_users
 from templates.offline_task.schedule_info import task_scheduler, default_engine
 from templates.dags.config_dependency import task_node_list, edit_node, show_edit_nodes
 from templates.data_work.get_task_info import get_users
+from templates.apscheduler.triggers.cron import CronTrigger
+
 
 
 def schedule_tasks():
@@ -41,9 +43,9 @@ def schedule_tasks():
                     task_status = task[3]
                     if not task_scheduler.get_job(job_id=job_name):
                         if task_status == '启用':
-                            hour = int(task_time.split(':')[0])
-                            minute = int(task_time.split(':')[1])
                             if task_frequency == '按天':
+                                hour = int(task_time.split(':')[0])
+                                minute = int(task_time.split(':')[1])
                                 task_scheduler.add_job(execute_sql, 'cron',
                                                        hour=str(hour),
                                                        minute=str(minute), second='0',
@@ -52,10 +54,12 @@ def schedule_tasks():
                                                        misfire_grace_time=600,
                                                        replace_existing=True,
                                                        id=str(job_name))
-                            elif task_frequency == '实时':
-                                task_scheduler.add_job(execute_sql, 'interval',
-                                                       hours=hour,
-                                                       minutes=minute, seconds=0,
+                            elif task_frequency == '自定义':
+                                task_scheduler.add_job(execute_sql,
+                                                       trigger=
+                                                       CronTrigger.
+                                                       from_crontab(task_time,
+                                                                    timezone='Asia/Shanghai'),
                                                        args=[str(job_name)],
                                                        jitter=random.randint(0, 60),
                                                        misfire_grace_time=600,

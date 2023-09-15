@@ -71,16 +71,18 @@
                 <label for="daily">按天</label></div>
             <br>
             <div class="radio-container">
-                <input type="radio" id="blanking" name="task_frequency" value="实时">
+                <input type="radio" id="blanking" name="task_frequency" value="自定义">
             </div>
             <div class="radio-container">
-                <label for="blanking">实时</label>
+                <label for="blanking">自定义</label>
             </div>
             <br>
             <div class="radio-container">
-                <label for="task_time">调度时间:</label></div>
+                <label for="task_time">cron表达式:</label></div>
             <div class="radio-container">
-                <input type="time" id="task_time" name="task_time" required>
+                <input type="text" id="task_time" name="task_time"
+                       placeholder="必须是英文状态字符"
+                >
             </div>
             <br>
             <div class="radio-container">
