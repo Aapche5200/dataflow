@@ -15,6 +15,17 @@ def execute_dependency_jobs(default_engine):
     job_result_all = get_task_result(default_engine, 0)
     job_results = [(job_name, job_t) for job_name, job_t, *_ in job_result_all]
 
+    yesterday = datetime.now() - timedelta(days=1)
+    yesterday_date = yesterday.date()
+
+    yesterday_job_result_all = get_task_result(default_engine, yesterday_date)
+    yesterday_job_results = \
+        [(job_name_y, job_t_y) for job_name_y, job_t_y, *_ in yesterday_job_result_all]
+
+    yesterday_job_results_other = {}
+    for job_id_y, result_y in yesterday_job_results:
+        yesterday_job_results_other[job_id_y] = result_y
+
     dependency_relations = [(parent_note, child_node) for parent_note, child_node in
                             parent_child_node
                             if
@@ -49,7 +60,8 @@ def execute_dependency_jobs(default_engine):
                     tomorrow = datetime.now() + timedelta(days=1)
                     tomorrow_date = tomorrow.date()
                     schedule_time = schedule_jobs_dict[next_job_id]
-                    if schedule_time.date() == tomorrow_date:
+                    if schedule_time.date() == tomorrow_date \
+                            and yesterday_job_results_other[next_job_id] is not None:
                         task_scheduler.modify_job(job_id=next_job_id,
                                                   next_run_time=datetime.now())
         else:
